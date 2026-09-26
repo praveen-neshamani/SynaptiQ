@@ -5,12 +5,14 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getAllCourses } from '@/lib/coursesRegistry'
+import CodeLabWorkspace from '@/components/CodeLabWorkspace'
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const courses = getAllCourses()
-  const [activeTab, setActiveTab] = useState<'cockpit' | 'curriculum' | 'analytics' | 'tuition'>('cockpit')
+  const [activeTab, setActiveTab] = useState<'cockpit' | 'codelab' | 'curriculum' | 'analytics' | 'tuition'>('cockpit')
+  const [selectedLabId, setSelectedLabId] = useState<string>('avl-rotation')
   const [timeframe, setTimeframe] = useState<'today' | 'monthly' | 'yearly'>('monthly')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -103,6 +105,28 @@ export default function StudentDashboard() {
               </button>
 
               <button
+                onClick={() => setActiveTab('codelab')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  activeTab === 'codelab'
+                    ? 'bg-[#8B3A62] text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <span>Code Lab</span>
+                <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                  activeTab === 'codelab'
+                    ? 'bg-white/20 text-white font-semibold'
+                    : 'bg-[#FFF5F8] text-[#8B3A62] font-bold border border-rose-200/60'
+                }`}>
+                  Live IDE
+                </span>
+              </button>
+
+              <button
                 onClick={() => startCourse('tree-graph-traversals')}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
               >
@@ -114,8 +138,15 @@ export default function StudentDashboard() {
               </button>
 
               <button
-                onClick={() => startCourse('sorting-searching')}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                onClick={() => {
+                  setSelectedLabId('avl-rotation')
+                  setActiveTab('codelab')
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  activeTab === 'codelab'
+                    ? 'text-slate-900 bg-slate-100 font-semibold'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
@@ -255,12 +286,6 @@ export default function StudentDashboard() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
             </div>
 
-            {/* Live Telemetry Active Pill */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-xs font-mono font-semibold text-emerald-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="hidden sm:inline">TELEMETRY ACTIVE</span>
-            </div>
-
             {/* Notification Bell */}
             <button className="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors" aria-label="Notifications">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -285,12 +310,19 @@ export default function StudentDashboard() {
 
         {/* Main Content Body */}
         <main className="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
-          {/* ── Welcome Greeting Bar ── */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-mono font-semibold text-[#8B3A62] tracking-wider mb-1">
-                ID: SQ-94821 • Cohort Alpha-2025
-              </div>
+          {activeTab === 'codelab' ? (
+            <CodeLabWorkspace
+              initialChallengeId={selectedLabId}
+              onBackToCockpit={() => setActiveTab('cockpit')}
+            />
+          ) : (
+            <>
+              {/* ── Welcome Greeting Bar ── */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="text-xs font-mono font-semibold text-[#8B3A62] tracking-wider mb-1">
+                    ID: SQ-94821 • Cohort Alpha-2025
+                  </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#171717]">
                 Welcome back, Scholar {studentDisplayName.split(' ')[0]}
               </h1>
@@ -435,7 +467,10 @@ export default function StudentDashboard() {
             </div>
 
             <button
-              onClick={() => startCourse('tree-graph-traversals')}
+              onClick={() => {
+                setSelectedLabId('avl-rotation')
+                setActiveTab('codelab')
+              }}
               className="px-5 py-2.5 rounded-lg bg-white text-[#7A2E53] hover:bg-slate-50 font-bold text-xs shadow-md transition-all self-start md:self-auto shrink-0 flex items-center gap-2"
             >
               <span>Resume Unit 4 Lab</span>
@@ -514,7 +549,10 @@ export default function StudentDashboard() {
                   <span>Review Codex</span>
                 </button>
                 <button
-                  onClick={() => startCourse('tree-graph-traversals')}
+                  onClick={() => {
+                    setSelectedLabId('avl-rotation')
+                    setActiveTab('codelab')
+                  }}
                   className="flex-1 py-2 px-3 rounded-lg bg-[#8B3A62] text-white hover:bg-[#6E2D4E] text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -596,7 +634,10 @@ export default function StudentDashboard() {
                   <span>View Proofs</span>
                 </button>
                 <button
-                  onClick={() => startCourse('sorting-searching')}
+                  onClick={() => {
+                    setSelectedLabId('dijkstra-shortest-path')
+                    setActiveTab('codelab')
+                  }}
                   className="flex-1 py-2 px-3 rounded-lg bg-[#8B3A62] text-white hover:bg-[#6E2D4E] text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -779,7 +820,10 @@ export default function StudentDashboard() {
                 </p>
 
                 <button
-                  onClick={() => startCourse('tree-graph-traversals')}
+                  onClick={() => {
+                    setSelectedLabId('avl-rotation')
+                    setActiveTab('codelab')
+                  }}
                   className="w-full py-2.5 px-4 rounded-lg bg-[#8B3A62] text-white hover:bg-[#6E2D4E] text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2"
                 >
                   <span>Start Practice Lab</span>
@@ -866,6 +910,8 @@ export default function StudentDashboard() {
               </div>
             </div>
           </div>
+            </>
+          )}
         </main>
       </div>
     </div>
