@@ -302,6 +302,25 @@ export default function StudentDashboard() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
             </div>
 
+            {/* Faculty Dashboard Navigator */}
+            <Link
+              href="/faculty/analytics"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FFF5F8] border border-rose-200/80 text-xs font-semibold text-[#8B3A62] hover:bg-[#8B3A62] hover:text-white transition-all shadow-xs group"
+              title="Navigate to Faculty Dashboard & Analytics"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="9" rx="1" />
+                <rect x="14" y="3" width="7" height="5" rx="1" />
+                <rect x="14" y="12" width="7" height="9" rx="1" />
+                <rect x="3" y="16" width="7" height="5" rx="1" />
+              </svg>
+              <span className="hidden sm:inline">Faculty Dashboard</span>
+              <span className="sm:hidden">Faculty</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="transition-transform group-hover:translate-x-0.5">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </Link>
+
             {/* Notification Bell */}
             <button className="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors" aria-label="Notifications">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
