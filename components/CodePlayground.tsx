@@ -41,14 +41,20 @@ export default function CodePlayground() {
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        <h3 style={{
-          margin: 0,
-          fontSize: 16,
-          fontWeight: 600,
-          color: '#c7d2fe',
-        }}>
-          💻 Code Playground
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c7d2fe" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+          <h3 style={{
+            margin: 0,
+            fontSize: 15,
+            fontWeight: 600,
+            color: '#c7d2fe',
+          }}>
+            Code Playground
+          </h3>
+        </div>
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           {/* Language Selector */}
@@ -175,11 +181,11 @@ export default function CodePlayground() {
       <div style={{
         padding: '8px 16px',
         borderTop: '1px solid rgba(99,102,241,0.2)',
-        fontSize: 11,
-        color: '#6b7280',
+        fontSize: 12,
+        color: '#94a3b8',
         textAlign: 'center',
       }}>
-        💡 Write code, click Run to execute • Supports input/output
+        Write code, click Run to execute • Supports input and output streams
       </div>
     </div>
   )

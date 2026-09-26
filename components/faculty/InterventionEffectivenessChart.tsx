@@ -37,7 +37,7 @@ export default function InterventionEffectivenessChart({
               color: '#8B3A62',
               borderColor: 'rgba(139, 58, 98, 0.3)',
             }}
-            className="text-[11px] px-2 py-0.5 rounded self-start sm:self-auto font-mono border"
+            className="text-xs px-2 py-0.5 rounded self-start sm:self-auto font-mono border"
           >
             Metric: Δ Percentage Points (pp)
           </span>
@@ -53,21 +53,21 @@ export default function InterventionEffectivenessChart({
               <div key={item.id} className="group">
                 <div className="flex items-center justify-between text-xs mb-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#2D2D2D]">{item.name}</span>
+                    <span className="font-semibold text-[#2D2D2D]">{item.name}</span>
                     <span
                       style={{
                         backgroundColor: '#FFF5F8',
                         color: '#8B3A62',
                         borderColor: 'rgba(139, 58, 98, 0.2)',
                       }}
-                      className="text-[10px] font-semibold px-2 py-0.5 rounded border"
+                      className="text-xs font-medium px-2 py-0.5 rounded border"
                     >
                       {item.category}
                     </span>
                   </div>
                   <span
                     style={{ color: '#8B3A62' }}
-                    className="font-extrabold text-sm"
+                    className="font-bold text-sm tabular-nums"
                   >
                     +{item.improvementPP} pp
                   </span>
@@ -91,7 +91,7 @@ export default function InterventionEffectivenessChart({
         </div>
       </div>
 
-      {/* AURA Pedagogic Observation Insight */}
+      {/* Intervention Yield Insight */}
       <div
         style={{
           backgroundColor: '#FFF5F8',
@@ -101,20 +101,18 @@ export default function InterventionEffectivenessChart({
       >
         <span
           style={{ backgroundColor: '#8B3A62', color: '#FFFFFF' }}
-          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5"
+          className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
         >
           i
         </span>
         <div className="flex-1">
           <div
             style={{ color: '#8B3A62' }}
-            className="font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 mb-0.5"
+            className="font-semibold text-xs flex items-center gap-1.5 mb-0.5"
           >
-            <span>AURA Comparative Yield Diagnostic</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8B3A62]"></span>
-            <span className="text-[10px] font-normal text-rose-700">Empirical Cohort Observation</span>
+            <span>Intervention Yield Analysis</span>
           </div>
-          <p style={{ color: '#2D2D2D' }} className="leading-relaxed font-semibold">
+          <p style={{ color: '#2D2D2D' }} className="leading-relaxed font-medium">
             "{topYield ? `${topYield.name} (+${topYield.improvementPP} pp)` : 'Active interventions'} demonstrated the highest competency improvement in the current cohort."
           </p>
         </div>

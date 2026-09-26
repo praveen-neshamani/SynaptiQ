@@ -126,7 +126,6 @@ export default function Dashboard() {
         alignItems: 'center',
         justifyContent: 'center',
         background: '#F5F5F0',
-        fontFamily: "'Rockwell', 'Rockwell Nova', 'Clarendon', 'Clarendon MT', 'Besley', Georgia, serif",
       }}>
         <div style={{ fontSize: 18, color: '#8B3A62', fontWeight: 600 }}>Loading SynaptiQ...</div>
       </div>
@@ -147,7 +146,6 @@ export default function Dashboard() {
         minHeight: '100vh',
         background: '#F5F5F0', // Porcelain white
         color: '#2d2d2d',
-        fontFamily: "'Rockwell', 'Rockwell Nova', 'Clarendon', 'Clarendon MT', 'Besley', Georgia, serif",
       }}
     >
       {/* Top Bar - Burgundy Pink */}

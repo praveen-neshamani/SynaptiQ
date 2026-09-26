@@ -80,7 +80,7 @@ export default function ActionableInsightsPanel({
               {/* Card top badge */}
               <div className="flex items-center justify-between mb-2.5">
                 <span
-                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded border uppercase tracking-wider ${getBadgeStyle(
+                  className={`text-xs font-semibold px-2.5 py-0.5 rounded border uppercase tracking-wider ${getBadgeStyle(
                     item.severity
                   )}`}
                 >
@@ -96,7 +96,7 @@ export default function ActionableInsightsPanel({
 
             {/* Recommendation Box */}
             <div className="mt-3 pt-3 border-t border-rose-200/60">
-              <div style={{ color: '#8B3A62' }} className="text-[10px] font-bold uppercase tracking-wider mb-1">
+              <div style={{ color: '#8B3A62' }} className="text-xs font-semibold uppercase tracking-wider mb-1">
                 Instructional Recommendation:
               </div>
               <p className="text-xs text-slate-700 leading-relaxed font-medium">

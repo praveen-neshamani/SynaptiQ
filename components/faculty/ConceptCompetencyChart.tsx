@@ -57,20 +57,20 @@ export default function ConceptCompetencyChart({
                       {c.concept}
                     </span>
                     {isCritical && (
-                      <span className="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">
-                        Lowest • Action Needed
+                      <span className="bg-rose-100 text-rose-800 border border-rose-300 text-xs font-semibold px-2 py-0.5 rounded">
+                        Action Needed
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-xs text-slate-500">
                       {c.studentsNeedingHelp} students below {benchmark}%
                     </span>
                     <span
                       style={{
                         color: isCritical ? '#BE123C' : isBelowBenchmark ? '#D97706' : '#8B3A62',
                       }}
-                      className="font-bold text-sm"
+                      className="font-bold text-sm tabular-nums"
                     >
                       {c.score}%
                     </span>
@@ -104,7 +104,7 @@ export default function ConceptCompetencyChart({
         </div>
       </div>
 
-      {/* AURA System-Generated Diagnostic Insight */}
+      {/* Diagnostic Observation */}
       <div
         style={{
           backgroundColor: '#FFF5F8',
@@ -114,20 +114,18 @@ export default function ConceptCompetencyChart({
       >
         <span
           style={{ backgroundColor: '#8B3A62', color: '#FFFFFF' }}
-          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5"
+          className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5"
         >
           i
         </span>
         <div className="flex-1">
           <div
             style={{ color: '#8B3A62' }}
-            className="font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 mb-0.5"
+            className="font-semibold text-xs flex items-center gap-1.5 mb-0.5"
           >
-            <span>AURA Diagnostic Engine</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8B3A62]"></span>
-            <span className="text-[10px] font-normal text-rose-700">Automated Signal</span>
+            <span>Diagnostic Observation</span>
           </div>
-          <p style={{ color: '#2D2D2D' }} className="leading-relaxed font-semibold">
+          <p style={{ color: '#2D2D2D' }} className="leading-relaxed font-medium">
             "{lowestConcept ? lowestConcept.concept : 'This unit'} has the lowest class-level competency ({lowestConcept?.score || 0}%) and requires additional instructional attention."
           </p>
         </div>

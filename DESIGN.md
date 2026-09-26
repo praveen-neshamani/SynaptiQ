@@ -55,25 +55,42 @@ The SynaptiQ color system is grounded in an institutional **Burgundy Pink** and 
 
 ## 3. Typographic Architecture
 
-SynaptiQ mandates an **Academic Slab-Serif** typography hierarchy to convey institutional prestige and pedagogical rigor.
+SynaptiQ enforces a **Strict Two-Tier Font Architecture** engineered for high-density, production-grade developer and analytical interfaces (matching Linear, Vercel, and Supabase standards).
 
-### 3.1 Primary Academic Font Stack
-```css
-font-family: 'Rockwell', 'Rockwell Nova', 'Clarendon', 'Clarendon MT', 'Besley', Georgia, serif;
-```
-- **Applied to:** `.faculty-dashboard`, `.student-dashboard`, `.font-academic`, and all child headings, buttons, selects, inputs, and paragraphs.
-- **Headings 1 (H1):** `32px` (`2rem`), Font Weight `700`, line-height `1.2`, letter-spacing `-0.02em`. Color: `#8B3A62`.
-- **Headings 2 (H2):** `24px` (`1.5rem`), Font Weight `700`, line-height `1.3`, letter-spacing `-0.01em`. Color: `#8B3A62`.
-- **Headings 3 (H3):** `18px – 20px`, Font Weight `700`, letter-spacing `-0.01em`. Color: `#8B3A62`.
-- **Body Text:** `14px – 15px`, Font Weight `400` / `500`, line-height `1.6`. Color: `#2D2D2D` or `#555555`.
-- **Attributions & Italic Quotes:** `17px`, Font Style `italic`, line-height `1.6`, high-contrast `#2D2D2D`.
+### 3.1 Strict Two-Tier Font Families
+1. **Primary UI Sans (`Inter`):**
+   ```css
+   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+   ```
+   - **Applied to:** Interface chrome, headings, body copy, navigation, forms, buttons, tooltips, cards, dashboards, charts, and operational text.
+   - **Characteristics:** Neutral, grotesque sans-serif with tight tracking on headings (`-0.02em` on H1, `-0.01em` on H2) for a grounded, engineered feel.
 
-### 3.2 Monospace & Telemetry Font Stack
-```css
-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-```
-- **Applied to:** Real-time digital clock ticker (`HH:MM:SS`), course identifier codes (`CS204`, `CS301`), pedagogical step tags (`Step 01`), tabular data, and diagnostic percentages.
-- **Features:** Strict tabular figures (`font-variant-numeric: tabular-nums`) to prevent jitter during live updates.
+2. **Technical Monospace (`JetBrains Mono`):**
+   ```css
+   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+   ```
+   - **Applied to:** Code blocks, inline identifiers, variables, method names, complexity metrics (`O(log n)`), live digital telemetry timestamps (`HH:MM:SS`), course identifier codes (`CS204`, `CS301`), and tabular data.
+   - **Features:** Strict tabular figures (`tabular-nums`) to eliminate jitter during real-time updates.
+
+### 3.2 Type Scale Hierarchy & Hard 12px Floor
+- **Hard Accessibility Floor:** STRICT RULE — NO TEXT UNDER 12PX. All micro-text (8px–11px) is permanently eliminated.
+- **Display / H1:** `32px – 36px` | line-height: `40px – 44px` | weight: `700` | letter-spacing: `-0.02em`
+- **H2:** `24px – 28px` | line-height: `32px – 36px` | weight: `700` | letter-spacing: `-0.01em`
+- **H3:** `20px – 22px` | line-height: `28px – 30px` | weight: `600`
+- **H4 / Subheading:** `16px – 18px` | line-height: `24px – 26px` | weight: `600`
+- **Body / Documentation:** `15px – 16px` | line-height: `24px – 26px` | weight: `400`
+- **UI Labels & Inputs:** `14px – 16px` | line-height: `20px – 24px` | weight: `500`
+- **Secondary Metadata / Table Cells:** `13px – 14px` | line-height: `18px – 20px` | weight: `400` / `500`
+- **Fine Metadata & Badges (The Floor):** `12px` | line-height: `16px` | weight: `500` / `600`
+- **Code Blocks:** `14px` | line-height: `22px` | weight: `400`
+- **Inline Code:** `13px` (or `0.9em`) | weight: `400` | background `rgba(0,0,0,0.05)` | padding `0.15em 0.4em` | radius `4px`
+
+### 3.3 Weight & Emphasis Governance (4 Weights Only)
+- **400 (Regular):** Default reading copy, explanations, and long paragraphs.
+- **500 (Medium):** Navigation items, interactive controls, secondary data labels, badges.
+- **600 (Semibold):** Subheadings, metric labels, card headers, table headers.
+- **700 (Bold):** Page titles, primary numbers/KPI values.
+- **Prohibitions:** Disallow font weights above 700 (no arbitrary 800/900). Never bold entire sentences. Limit italics strictly to literary quotes or mathematical variables.
 
 ---
 
@@ -103,10 +120,9 @@ No Unicode emojis (`🧠`, `📊`, `👋`, `🌳`, `🔍`, `📹`, `📚`, etc.)
 ## 5. Component Stylings & Behaviors
 
 ### 5.1 Top Navigation Bar
-- **Surface:** Solid SynaptiQ Burgundy Pink (`#8B3A62`), `padding: 16px 32px`, bottom shadow `0 2px 8px rgba(0, 0, 0, 0.12)`.
-- **Top Disclaimer Bar (Faculty):** Dark Crimson (`#5A1E3B`), `py-1.5`, border bottom `1px solid rgba(255, 255, 255, 0.10)`.
-- **Brand Title:** White `#FFFFFF`, weight `700`, `24px` with subtitle `13px` in `rgba(255, 255, 255, 0.85)`.
-- **Controls:** Glass-morphism action buttons with `rgba(255, 255, 255, 0.15)` fill and `rgba(255, 255, 255, 0.35)` borders.
+- **Surface:** Solid SynaptiQ Burgundy Pink (`#8B3A62`), `padding: 14px 32px`, bottom shadow `0 2px 8px rgba(0, 0, 0, 0.12)`.
+- **Brand Title:** White `#FFFFFF`, weight `700`, `22px–24px` with subtitle `13px` in `rgba(255, 255, 255, 0.85)`.
+- **Controls:** Consolidated action buttons with `rgba(255, 255, 255, 0.15)` fill and `rgba(255, 255, 255, 0.30)` borders.
 
 ### 5.2 Course & Content Cards
 - **Base State:**
@@ -122,7 +138,13 @@ No Unicode emojis (`🧠`, `📊`, `👋`, `🌳`, `🔍`, `📹`, `📚`, etc.)
   - Border Color: `#A0466E`.
   - Shadow: `0 6px 20px rgba(139, 58, 98, 0.18)`.
 
-### 5.3 Buttons
+### 5.3 Metric & KPI Cards
+- **Primary Metric Value:** Rendered in Primary UI Sans (`Inter`), `28px–32px`, weight `700`, using `tabular-nums` for alignment.
+- **Metric Label:** Positioned cleanly in `13px–14px`, weight `500–600`, readable tone `#8B3A62` or `#475569`.
+- **Status Indicators:** Standardized baseline alignment; placed next to the primary number or anchored top-right.
+- **Subtext Footnotes:** Fixed at `12px` with distinct vertical separation (`border-t border-rose-100 pt-2.5`).
+
+### 5.4 Buttons
 - **Primary Button:**
   - Background: `#8B3A62`.
   - Text: `#FFFFFF`, weight `600`, `14px`.
@@ -134,17 +156,17 @@ No Unicode emojis (`🧠`, `📊`, `👋`, `🌳`, `🔍`, `📹`, `📚`, etc.)
   - Border: `1px solid rgba(139, 58, 98, 0.3)`.
   - Text: `#8B3A62` or `#FFFFFF`.
 
-### 5.4 Form Controls & Dropdown Selectors
+### 5.5 Form Controls & Dropdown Selectors
 - **Course Selector:**
   - Background: `rgba(255, 255, 255, 0.15)` or `#FFFFFF`.
   - Border: `1px solid rgba(255, 255, 255, 0.25)` or `2px solid #8B3A62`.
-  - Label: Uppercase `10px`, tracking `0.05em`, bold.
-  - Font: Rockwell / Clarendon bold.
+  - Label: `12px`, weight `500`.
+  - Font: Primary UI Sans (`Inter`) with bold selection values.
   - Dropdown Options: High-contrast slate typography (`text-slate-800`).
 
-### 5.5 Telemetry Live Indicator
+### 5.6 Telemetry Live Indicator
 - **Pulse Beacon:** Dual-ring emerald badge (`#34D399`) with continuous `animate-ping` behind a solid dot.
-- **Clock Display:** `font-mono`, `tabular-nums`, high-contrast white text, updated once per second via synchronous timer.
+- **Clock Display:** `JetBrains Mono` (`font-mono`), `tabular-nums`, high-contrast white text, updated once per second via synchronous timer.
 
 ---
 
@@ -161,10 +183,11 @@ No Unicode emojis (`🧠`, `📊`, `👋`, `🌳`, `🔍`, `📹`, `📚`, etc.)
 - **Faculty Analytics:** 12-column responsive layout:
   - 7-Column Concept-wise Competency Chart.
   - 5-Column Cohort Mastery Donut & Distribution Panel.
-  - Full-width AURA closed-loop pipeline workflow banner.
+  - Full-width Pedagogical Workflow banner.
 - **Mobile Collapse (< 768px):**
   - All grids strictly collapse into single-column layouts.
   - Minimum touch target for all buttons and dropdowns: `44px × 44px`.
+  - Input font size minimum `16px` to prevent automatic zoom on mobile browsers.
   - Zero horizontal overflow.
 
 ---
@@ -184,10 +207,13 @@ The following patterns are **strictly banned** across the SynaptiQ codebase:
 
 | Prohibited Anti-Pattern | Reason / Correction |
 | :--- | :--- |
-| **Emojis Anywhere** | Emojis degrade academic credibility. Always use tailored SVG vector graphics. |
+| **Legacy / Serif Fonts** | Strictly prohibited. No Rockwell, Clarendon, Besley, Georgia, Times, or arbitrary display fonts. Use only Inter and JetBrains Mono. |
+| **Sub-12px Micro-Text** | Strictly prohibited. No text under 12px anywhere. |
+| **Weights Above 700** | No `font-extrabold` (800) or `font-black` (900). Use 400, 500, 600, or 700 only. |
+| **Emojis Anywhere** | Emojis degrade technical credibility. Always use tailored SVG vector graphics. |
 | **Neon Cyberpunk / AI Glows** | No electric cyan, neon purple, or dark cyberpunk glow aesthetics. |
 | **Pure Black (`#000000`)** | Harsh contrast. Use Charcoal Ink (`#2D2D2D`) or Slate (`#1F2937`). |
 | **Generic Placeholder Terms** | No "DEMO", "SIMULATED DATA", "Lorem Ipsum", or "John Doe". Use realistic academic cohorts and student identifiers. |
-| **Generic Default Sans-Serifs** | Do not revert to unstyled `Arial`, `Inter`, or `Roboto` in dashboards. Maintain the Rockwell / Clarendon academic slab-serif hierarchy. |
+| **Over-Instrumented Meta Clutter** | No pseudo-intellectual uppercase clutter or redundant telemetry flags. Prune at least 30% of unnecessary decorative badges. |
 | **Overlapping Elements** | Never stack absolute-positioned typography over imagery or cards. |
-| **Layout Jitter** | Never use non-tabular numbers for live ticking clocks or animated percentages. |
+| **Layout Jitter** | Never use non-tabular numbers for live ticking clocks or animated percentages. Always apply `tabular-nums`. |

@@ -24,7 +24,6 @@ export default function FacultyAnalyticsPage() {
       style={{
         backgroundColor: '#F5F5F0', // Porcelain White matching student dashboard
         color: '#2D2D2D',
-        fontFamily: "'Rockwell', 'Rockwell Nova', 'Clarendon', 'Clarendon MT', 'Besley', Georgia, serif",
       }}
       className="faculty-dashboard min-h-screen flex flex-col selection:bg-[#FFF5F8] selection:text-[#8B3A62]"
     >

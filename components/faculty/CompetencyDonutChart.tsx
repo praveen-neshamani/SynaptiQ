@@ -84,10 +84,10 @@ export default function CompetencyDonutChart({
 
             {/* Center Label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-              <span style={{ color: '#8B3A62' }} className="text-2xl font-black tracking-tight">
+              <span style={{ color: '#8B3A62' }} className="text-2xl font-bold tabular-nums tracking-tight">
                 {activeCategory ? `${activeCategory.percentage}%` : `${totalStudents}`}
               </span>
-              <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-600">
                 {activeCategory ? activeCategory.label : 'Total Students'}
               </span>
             </div>
@@ -112,12 +112,12 @@ export default function CompetencyDonutChart({
                     style={{ backgroundColor: cat.color }}
                   />
                   <div>
-                    <div className="text-xs font-bold text-[#2D2D2D]">{cat.label}</div>
-                    <div className="text-[10px] text-slate-500 font-medium">{cat.studentCount} students</div>
+                    <div className="text-xs font-semibold text-[#2D2D2D]">{cat.label}</div>
+                    <div className="text-xs text-slate-500 font-normal">{cat.studentCount} students</div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div style={{ color: '#8B3A62' }} className="text-sm font-extrabold">{cat.percentage}%</div>
+                  <div style={{ color: '#8B3A62' }} className="text-sm font-bold tabular-nums">{cat.percentage}%</div>
                 </div>
               </div>
             ))}
@@ -125,7 +125,7 @@ export default function CompetencyDonutChart({
         </div>
       </div>
 
-      {/* AURA System Insight */}
+      {/* Cohort Insight */}
       <div
         style={{
           backgroundColor: '#FFF5F8',
@@ -135,20 +135,18 @@ export default function CompetencyDonutChart({
       >
         <span
           style={{ backgroundColor: '#BE123C', color: '#FFFFFF' }}
-          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5"
+          className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
         >
           !
         </span>
         <div className="flex-1">
           <div
             style={{ color: '#8B3A62' }}
-            className="font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 mb-0.5"
+            className="font-semibold text-xs flex items-center gap-1.5 mb-0.5"
           >
-            <span>AURA Cohort Alert</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8B3A62]"></span>
-            <span className="text-[10px] font-normal text-rose-700">Distribution Diagnostic</span>
+            <span>Cohort Distribution Insight</span>
           </div>
-          <p style={{ color: '#2D2D2D' }} className="leading-relaxed font-semibold">
+          <p style={{ color: '#2D2D2D' }} className="leading-relaxed font-medium">
             "{needsIntervention ? `${needsIntervention.percentage}% of students (${needsIntervention.studentCount} students)` : 'A subset of students'} currently require additional intervention."
           </p>
         </div>

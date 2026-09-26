@@ -26,9 +26,9 @@ export default function FacultyKpiCards({
         }}
         className="rounded-xl p-5 sm:p-6 flex flex-col justify-between hover:shadow-md transition-all"
       >
-        <div className="flex items-center justify-between mb-2">
-          <span style={{ color: '#8B3A62' }} className="text-xs font-bold uppercase tracking-wider">
-            Total Enrolled Cohort
+        <div className="flex items-center justify-between mb-1">
+          <span style={{ color: '#8B3A62' }} className="text-sm font-semibold">
+            Enrolled Students
           </span>
           <span
             style={{ backgroundColor: '#FFF5F8', color: '#8B3A62', borderColor: 'rgba(139, 58, 98, 0.3)' }}
@@ -40,16 +40,16 @@ export default function FacultyKpiCards({
           </span>
         </div>
         <div className="flex items-baseline gap-3 my-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-[#2D2D2D] tracking-tight">
+          <div className="text-3xl font-bold text-[#2D2D2D] tabular-nums tracking-tight">
             {totalStudents}
           </div>
-          <span className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-            Active in Analytics
+          <span className="text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+            Active in Course
           </span>
         </div>
         <div className="text-xs text-slate-500 mt-2 flex items-center justify-between border-t border-rose-100 pt-2.5">
           <span>Section {courseCode}-A & B</span>
-          <span className="font-semibold text-slate-700">100% Diagnostic Coverage</span>
+          <span className="font-medium text-slate-700">100% Diagnostic Coverage</span>
         </div>
       </div>
 
@@ -62,9 +62,9 @@ export default function FacultyKpiCards({
         }}
         className="rounded-xl p-5 sm:p-6 flex flex-col justify-between hover:shadow-md transition-all"
       >
-        <div className="flex items-center justify-between mb-2">
-          <span style={{ color: '#8B3A62' }} className="text-xs font-bold uppercase tracking-wider">
-            Cohort Average Competency
+        <div className="flex items-center justify-between mb-1">
+          <span style={{ color: '#8B3A62' }} className="text-sm font-semibold">
+            Average Competency
           </span>
           <span
             style={{ backgroundColor: '#FFF5F8', color: '#8B3A62', borderColor: 'rgba(139, 58, 98, 0.3)' }}
@@ -76,24 +76,24 @@ export default function FacultyKpiCards({
           </span>
         </div>
         <div className="flex items-baseline gap-3 my-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-[#2D2D2D] tracking-tight">
+          <div className="text-3xl font-bold text-[#2D2D2D] tabular-nums tracking-tight">
             {averageCompetency}%
           </div>
           <span
-            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+            className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${
               isAboveBenchmark
                 ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
                 : 'text-amber-800 bg-amber-50 border-amber-200'
             }`}
           >
             {isAboveBenchmark
-              ? `+${averageCompetency - benchmark}% Above Target (${benchmark}%)`
-              : `Below Target (${benchmark}%)`}
+              ? `+${averageCompetency - benchmark}% Above Benchmark (${benchmark}%)`
+              : `Below Benchmark (${benchmark}%)`}
           </span>
         </div>
         <div className="text-xs text-slate-500 mt-2 flex items-center justify-between border-t border-rose-100 pt-2.5">
           <span>Aggregated across 6 core concepts</span>
-          <span className="font-semibold text-slate-700">Institutional Benchmark: ≥ 70%</span>
+          <span className="font-medium text-slate-700">Benchmark: ≥ {benchmark}%</span>
         </div>
       </div>
     </div>

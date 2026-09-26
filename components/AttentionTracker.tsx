@@ -163,19 +163,20 @@ export default function AttentionTracker({ onDistraction, onSleep }: AttentionTr
         />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <span style={{
-            fontSize: 11,
+            fontSize: 12,
+            fontWeight: 500,
             color: status === 'active' ? '#16a34a'
                  : status === 'error'  ? '#ef4444'
                  : '#94a3b8',
           }}>
-            {status === 'loading' && '⏳ Starting camera...'}
-            {status === 'active'  && '🟢 Attention tracking on'}
-            {status === 'error'   && '🔴 Tracker unavailable'}
+            {status === 'loading' && 'Starting camera...'}
+            {status === 'active'  && 'Attention tracking on'}
+            {status === 'error'   && 'Tracker unavailable'}
           </span>
 
           {status === 'active' && (
-            <span style={{ fontSize: 10, color: '#94a3b8' }}>
-              EAR: {debugEAR} {debugEAR.includes('no face') ? '' : Number(debugEAR.split(' ')[0]) < 0.20 ? '😴 closed' : '👁 open'}
+            <span style={{ fontSize: 12, color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+              EAR: {debugEAR} {debugEAR.includes('no face') ? '' : Number(debugEAR.split(' ')[0]) < 0.20 ? 'closed' : 'open'}
             </span>
           )}
         </div>
@@ -184,10 +185,10 @@ export default function AttentionTracker({ onDistraction, onSleep }: AttentionTr
       {/* Attention Progress Bar */}
       <div style={{ flex: 1, maxWidth: '280px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#8B3A62' }}>
-            📊 Attention Level
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#8B3A62' }}>
+            Attention Level
           </span>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#8B3A62' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#8B3A62', fontVariantNumeric: 'tabular-nums' }}>
             {attentionScore.toFixed(0)}%
           </span>
         </div>
@@ -212,7 +213,7 @@ export default function AttentionTracker({ onDistraction, onSleep }: AttentionTr
             paddingRight: 8,
           }}>
             {attentionScore > 15 && (
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#fff' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
                 {attentionScore.toFixed(0)}%
               </span>
             )}

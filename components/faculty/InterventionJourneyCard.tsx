@@ -50,7 +50,7 @@ export default function InterventionJourneyCard({
                   color: '#8B3A62',
                   borderColor: 'rgba(139, 58, 98, 0.3)',
                 }}
-                className="text-[10px] font-bold px-2 py-0.5 rounded border"
+                className="text-xs font-semibold px-2 py-0.5 rounded border"
               >
                 Individual Trace
               </span>
@@ -62,7 +62,7 @@ export default function InterventionJourneyCard({
 
           {/* Student Switcher */}
           <div className="flex items-center gap-1.5 self-start sm:self-auto bg-slate-50 border border-rose-200/60 rounded-lg p-1">
-            <span className="text-[11px] text-slate-400 font-semibold px-1">Case:</span>
+            <span className="text-xs text-slate-500 font-medium px-1">Case:</span>
             {studentKeys.map((key) => (
               <button
                 key={key}
@@ -71,7 +71,7 @@ export default function InterventionJourneyCard({
                   backgroundColor: activeStudentKey === key ? '#8B3A62' : 'transparent',
                   color: activeStudentKey === key ? '#FFFFFF' : '#4B5563',
                 }}
-                className="text-xs px-2.5 py-1 rounded font-bold transition-all shadow-xs"
+                className="text-xs px-2.5 py-1 rounded font-semibold transition-all shadow-xs"
               >
                 {key}
               </button>
@@ -88,25 +88,25 @@ export default function InterventionJourneyCard({
           className="border rounded-lg p-3 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs"
         >
           <div>
-            <span className="text-slate-500 text-[11px] uppercase font-bold">Student:</span>{' '}
-            <span className="font-extrabold text-[#2D2D2D]">{student.studentLabel}</span>
+            <span className="text-slate-500 text-xs font-medium">Student:</span>{' '}
+            <span className="font-bold text-[#2D2D2D]">{student.studentLabel}</span>
           </div>
           <div>
-            <span className="text-slate-500 text-[11px] uppercase font-bold">Diagnostic Concept:</span>{' '}
+            <span className="text-slate-500 text-xs font-medium">Diagnostic Concept:</span>{' '}
             <span
               style={{
                 backgroundColor: '#FFFFFF',
                 color: '#8B3A62',
                 borderColor: '#8B3A62',
               }}
-              className="font-extrabold px-2.5 py-0.5 rounded border"
+              className="font-semibold px-2.5 py-0.5 rounded border"
             >
               {student.concept}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-slate-500 text-[11px] uppercase font-bold">Status:</span>
-            <span className="font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded flex items-center gap-1.5">
+            <span className="text-slate-500 text-xs font-medium">Status:</span>
+            <span className="font-semibold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block"></span>
               {student.status}
             </span>
@@ -129,7 +129,7 @@ export default function InterventionJourneyCard({
                     color: isMastery || isIntervention ? '#FFFFFF' : '#8B3A62',
                     borderColor: isMastery ? '#059669' : '#8B3A62',
                   }}
-                  className="absolute -left-6 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold border shadow-xs"
+                  className="absolute -left-6 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border shadow-xs"
                 >
                   {isMastery ? (
                     <svg className="w-2.5 h-2.5 stroke-white stroke-2 fill-none" viewBox="0 0 24 24">
@@ -157,7 +157,7 @@ export default function InterventionJourneyCard({
                             color: isMastery ? '#065F46' : isIntervention ? '#8B3A62' : '#4B5563',
                             borderColor: isMastery ? '#A7F3D0' : isIntervention ? 'rgba(139, 58, 98, 0.3)' : '#E5E7EB',
                           }}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded border"
+                          className="text-xs font-medium px-2 py-0.5 rounded border"
                         >
                           {step.badgeText}
                         </span>
@@ -172,19 +172,19 @@ export default function InterventionJourneyCard({
                           color: '#8B3A62',
                           borderColor: 'rgba(139, 58, 98, 0.3)',
                         }}
-                        className="font-extrabold px-2 py-0.5 rounded text-xs border"
+                        className="font-bold px-2 py-0.5 rounded text-xs border tabular-nums"
                       >
                         {step.score}%
                       </span>
                     )}
 
                     {step.gain && (
-                      <span className="font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                      <span className="font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-xs tabular-nums">
                         {step.gain}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-snug">{step.detail}</p>
+                  <p className="text-xs text-slate-600 mt-1 leading-normal">{step.detail}</p>
                 </div>
               </div>
             )
@@ -200,26 +200,26 @@ export default function InterventionJourneyCard({
           className="grid grid-cols-2 sm:grid-cols-4 gap-2 border rounded-lg p-3 mt-4 text-center"
         >
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-500">Initial Competency</div>
-            <div className="text-base font-extrabold text-slate-700 mt-0.5">{student.initialScore}%</div>
+            <div className="text-xs font-medium text-slate-500">Initial Competency</div>
+            <div className="text-base font-bold text-slate-700 mt-0.5 tabular-nums">{student.initialScore}%</div>
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-500">Final Competency</div>
-            <div className="text-base font-extrabold text-emerald-700 mt-0.5">{student.finalScore}%</div>
+            <div className="text-xs font-medium text-slate-500">Final Competency</div>
+            <div className="text-base font-bold text-emerald-700 mt-0.5 tabular-nums">{student.finalScore}%</div>
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-500">Net Improvement</div>
-            <div style={{ color: '#8B3A62' }} className="text-base font-black mt-0.5">+{student.totalImprovement} pp</div>
+            <div className="text-xs font-medium text-slate-500">Net Improvement</div>
+            <div style={{ color: '#8B3A62' }} className="text-base font-bold mt-0.5 tabular-nums">+{student.totalImprovement} pp</div>
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-500">Interventions</div>
-            <div className="text-base font-extrabold text-slate-700 mt-0.5">{student.interventionsCount} Stages</div>
+            <div className="text-xs font-medium text-slate-500">Interventions</div>
+            <div className="text-base font-bold text-slate-700 mt-0.5">{student.interventionsCount} Stages</div>
           </div>
         </div>
       </div>
 
       {/* Footnote Trace Label */}
-      <div className="mt-3 text-[11px] text-slate-400 italic text-center">
+      <div className="mt-3 text-xs text-slate-500 italic text-center">
         * Longitudinal student remediation pathway and competency progression record.
       </div>
     </div>

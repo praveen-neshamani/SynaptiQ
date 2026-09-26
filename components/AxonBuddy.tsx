@@ -45,13 +45,25 @@ export default function AxonBuddy({ correctAnswer, explanation, onClose }: AxonB
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 28 }}>🤖</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 34,
+            height: 34,
+            borderRadius: 8,
+            background: 'rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+            </svg>
+          </div>
           <div>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#fff' }}>
               AxonBuddy
             </h3>
-            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>
               Your Learning Assistant
             </p>
           </div>
@@ -99,7 +111,9 @@ export default function AxonBuddy({ correctAnswer, explanation, onClose }: AxonB
             gap: 8,
             marginBottom: 8,
           }}>
-            <span style={{ fontSize: 18 }}>✅</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
             <h4 style={{
               margin: 0,
               fontSize: 13,
@@ -135,7 +149,10 @@ export default function AxonBuddy({ correctAnswer, explanation, onClose }: AxonB
             gap: 8,
             marginBottom: 8,
           }}>
-            <span style={{ fontSize: 18 }}>💡</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B3A62" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z" />
+              <line x1="9" y1="21" x2="15" y2="21" />
+            </svg>
             <h4 style={{
               margin: 0,
               fontSize: 13,
@@ -181,7 +198,7 @@ export default function AxonBuddy({ correctAnswer, explanation, onClose }: AxonB
           onMouseEnter={(e) => e.currentTarget.style.background = '#A0466E'}
           onMouseLeave={(e) => e.currentTarget.style.background = '#8B3A62'}
         >
-          Got it! 👍
+          Got it
         </button>
       </div>
     </div>

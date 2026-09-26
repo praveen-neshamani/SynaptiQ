@@ -240,7 +240,6 @@ function LearnContent() {
         minHeight: '100vh',
         background: '#F5F5F0',
         color: '#2d2d2d',
-        fontFamily: "'Segoe UI', sans-serif",
         display: 'flex',
         flexDirection: 'column',
       }}>
@@ -503,7 +502,7 @@ function LearnContent() {
                     </div>
                     <p style={{
                       margin: '10px 0 0',
-                      fontSize: 11,
+                      fontSize: 12,
                       color: '#2d2d2d',
                       textAlign: 'center',
                     }}>
@@ -784,7 +783,7 @@ function LearnContent() {
                 <p style={{ color: '#fbbf24', fontSize: 12, marginTop: 8 }}>
                   Watch the basics video, then re-attempt this concept. 💪
                 </p>
-                <p style={{ color: '#6b7280', fontSize: 11, marginBottom: 12 }}>
+                <p style={{ color: '#6b7280', fontSize: 12, marginBottom: 12 }}>
                   Check the knowledge graph on the right — you&apos;ll see the new node!
                 </p>
                 <button

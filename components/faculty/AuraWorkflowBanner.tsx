@@ -21,11 +21,11 @@ export default function AuraWorkflowBanner() {
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-rose-100 gap-2">
         <div>
-          <span style={{ color: '#8B3A62' }} className="text-xs uppercase font-extrabold tracking-wider">
-            AURA Core Pedagogical Pipeline
+          <span style={{ color: '#8B3A62' }} className="text-xs font-semibold tracking-wide">
+            Pedagogical Workflow
           </span>
-          <h2 className="text-sm font-bold text-slate-800">
-            Competency-Driven Adaptive Learning & Closed-Loop Intervention Architecture
+          <h2 className="text-sm font-semibold text-slate-800 mt-0.5">
+            Continuous competency diagnosis and targeted interventions
           </h2>
         </div>
         <span
@@ -34,9 +34,9 @@ export default function AuraWorkflowBanner() {
             color: '#8B3A62',
             borderColor: 'rgba(139, 58, 98, 0.3)',
           }}
-          className="text-xs font-semibold px-2.5 py-1 rounded-md self-start sm:self-auto font-mono border"
+          className="text-xs font-medium px-2.5 py-1 rounded-md self-start sm:self-auto font-mono border"
         >
-          Closed-Loop Cycle
+          Closed-Loop Pipeline
         </span>
       </div>
 
@@ -56,25 +56,25 @@ export default function AuraWorkflowBanner() {
                   backgroundColor: '#8B3A62',
                   color: '#FFFFFF',
                 }}
-                className="w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center shadow-xs"
+                className="w-5 h-5 rounded-full text-xs font-semibold flex items-center justify-center shadow-xs"
               >
                 {idx + 1}
               </span>
-              <span className="text-[10px] uppercase font-bold text-slate-400">
+              <span className="text-xs font-mono font-medium text-slate-500">
                 {step.phase}
               </span>
             </div>
             <div
               style={{ color: '#8B3A62' }}
-              className="text-xs font-bold tracking-tight"
+              className="text-xs font-semibold tracking-tight"
             >
               {step.label}
             </div>
-            <div className="text-[11px] text-slate-600 leading-tight mt-0.5 font-medium">
+            <div className="text-xs text-slate-600 leading-normal mt-0.5 font-normal">
               {step.desc}
             </div>
             {idx < steps.length - 1 && (
-              <span className="hidden lg:block absolute -right-2.5 top-1/2 -translate-y-1/2 text-rose-300 font-bold z-10">
+              <span className="hidden lg:block absolute -right-2.5 top-1/2 -translate-y-1/2 text-rose-300 font-semibold z-10">
                 ›
               </span>
             )}
