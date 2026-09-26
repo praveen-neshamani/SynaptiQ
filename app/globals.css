@@ -39,6 +39,17 @@ body {
 .faculty-dashboard h3,
 .faculty-dashboard p,
 .faculty-dashboard span,
-.faculty-dashboard div {
+.faculty-dashboard div,
+.student-dashboard,
+.student-dashboard button,
+.student-dashboard select,
+.student-dashboard input,
+.student-dashboard textarea,
+.student-dashboard h1,
+.student-dashboard h2,
+.student-dashboard h3,
+.student-dashboard p,
+.student-dashboard span,
+.student-dashboard div {
   font-family: 'Rockwell', 'Rockwell Nova', 'Clarendon', 'Clarendon MT', 'Besley', Georgia, serif;
 }

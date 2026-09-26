@@ -25,13 +25,13 @@ export interface Course {
   quizzes: VideoQuizMap
 }
 
-// 📚 ALL COURSES REGISTRY
+// ALL COURSES REGISTRY
 export const courses: Record<string, Course> = {
   'tree-graph-traversals': {
     id: 'tree-graph-traversals',
     title: 'Tree and Graph Traversals',
     description: 'Master BFS, DFS, and Binary Search Trees with hands-on examples and real-world applications.',
-    thumbnail: '🌳',
+    thumbnail: 'tree-graph',
     mainVideos: treeGraphMainVideos,
     fundamentals: treeGraphFundamentals,
     quizzes: treeGraphQuizzes,
@@ -40,7 +40,7 @@ export const courses: Record<string, Course> = {
     id: 'sorting-searching',
     title: 'Sorting and Searching Algorithms',
     description: 'Learn Binary Search, Insertion Sort, and Heap Sort with step-by-step visualizations.',
-    thumbnail: '🔍',
+    thumbnail: 'sorting-searching',
     mainVideos: sortingSearchingMainVideos,
     fundamentals: sortingSearchingFundamentals,
     quizzes: sortingSearchingQuizzes,
