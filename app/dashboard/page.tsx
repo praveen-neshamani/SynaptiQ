@@ -6,12 +6,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getAllCourses } from '@/lib/coursesRegistry'
 import CodeLabWorkspace from '@/components/CodeLabWorkspace'
+import ScholarSettingsWorkspace from '@/components/ScholarSettingsWorkspace'
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const courses = getAllCourses()
-  const [activeTab, setActiveTab] = useState<'cockpit' | 'codelab' | 'curriculum' | 'analytics' | 'tuition'>('cockpit')
+  const [activeTab, setActiveTab] = useState<'cockpit' | 'codelab' | 'settings' | 'curriculum' | 'analytics' | 'tuition'>('cockpit')
   const [selectedLabId, setSelectedLabId] = useState<string>('avl-rotation')
   const [timeframe, setTimeframe] = useState<'today' | 'monthly' | 'yearly'>('monthly')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -168,8 +169,19 @@ export default function StudentDashboard() {
                 <span>Assessments</span>
               </button>
 
-              <Link
-                href="/faculty/analytics"
+              <button
+                onClick={() => {
+                  if (activeTab !== 'cockpit') {
+                    setActiveTab('cockpit')
+                    setTimeout(() => {
+                      const el = document.getElementById('student-progress-analytics')
+                      if (el) el.scrollIntoView({ behavior: 'smooth' })
+                    }, 50)
+                  } else {
+                    const el = document.getElementById('student-progress-analytics')
+                    if (el) el.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -178,7 +190,7 @@ export default function StudentDashboard() {
                   <line x1="6" y1="20" x2="6" y2="14" />
                 </svg>
                 <span>Progress Analytics</span>
-              </Link>
+              </button>
 
               <button
                 onClick={() => {
@@ -202,16 +214,20 @@ export default function StudentDashboard() {
               SYSTEM CONFIGURATION
             </div>
             <nav className="space-y-1">
-              <Link
-                href="/faculty/analytics"
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  activeTab === 'settings'
+                    ? 'bg-[#8B3A62] text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
                 <span>Settings</span>
-              </Link>
+              </button>
 
               <button
                 onClick={logout}
@@ -296,7 +312,11 @@ export default function StudentDashboard() {
             </button>
 
             {/* User Profile */}
-            <div className="flex items-center gap-3 pl-2 sm:border-l sm:border-slate-200">
+            <button
+              onClick={() => setActiveTab('settings')}
+              className="flex items-center gap-3 pl-2 sm:border-l sm:border-slate-200 hover:opacity-80 transition-opacity text-left cursor-pointer"
+              title="Open Scholar Settings"
+            >
               <div className="w-8 h-8 rounded-full bg-[#8B3A62] text-white font-bold flex items-center justify-center text-xs shadow-xs">
                 {studentDisplayName.charAt(0).toUpperCase()}
               </div>
@@ -304,7 +324,7 @@ export default function StudentDashboard() {
                 <div className="text-xs font-bold text-[#171717] leading-none">{studentDisplayName}</div>
                 <div className="text-xs text-slate-400 font-medium mt-0.5">Student Fellow</div>
               </div>
-            </div>
+            </button>
           </div>
         </header>
 
@@ -313,6 +333,12 @@ export default function StudentDashboard() {
           {activeTab === 'codelab' ? (
             <CodeLabWorkspace
               initialChallengeId={selectedLabId}
+              onBackToCockpit={() => setActiveTab('cockpit')}
+            />
+          ) : activeTab === 'settings' ? (
+            <ScholarSettingsWorkspace
+              studentName={studentDisplayName}
+              studentEmail={email}
               onBackToCockpit={() => setActiveTab('cockpit')}
             />
           ) : (
@@ -655,7 +681,7 @@ export default function StudentDashboard() {
             {/* Left 7 Columns: Core Concept Mastery & Diagnostic Executions */}
             <div className="lg:col-span-7 space-y-6">
               {/* Core Concept Mastery Widget */}
-              <div className="bg-[#FFFFFF] border border-slate-200/80 rounded-xl p-6 shadow-xs">
+              <div id="student-progress-analytics" className="bg-[#FFFFFF] border border-slate-200/80 rounded-xl p-6 shadow-xs">
                 <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
                   <div>
                     <h3 className="text-base font-bold text-[#171717] tracking-tight">
