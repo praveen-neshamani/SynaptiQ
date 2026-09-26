@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynaptiQ | Heap Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --porcelain: #FFFEFC;
+            --deep-pink: #8e3563;
+            --soft-pink: #fceef5;
+            --accent-pink: #d65a92;
+            --btn-green: #28a745;
+            --btn-red: #dc3545;
+            --text-dark: #2d1b24;
+            --card-shadow: 0 20px 40px rgba(142, 53, 99, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--porcelain);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: var(--deep-pink);
+            padding: 0 5%;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .nav-left { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .nav-right { font-weight: 400; font-size: 0.85rem; opacity: 0.9; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        main {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            height: calc(100vh - 60px);
+        }
+
+        .simulator-section {
+            flex: 0 0 60%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        .simulator-card {
+            flex: 1;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(142, 53, 99, 0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: float 6s ease-in-out infinite;
+            position: relative;
+            background-image: radial-gradient(var(--soft-pink) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            justify-content: center;
+            margin-bottom: 15px;
+            border: 1px solid var(--soft-pink);
+            align-items: center;
+        }
+
+        input {
+            padding: 10px 15px;
+            border: 2px solid var(--soft-pink);
+            border-radius: 10px;
+            width: 80px;
+            outline: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.85rem;
+        }
+
+        .btn-insert { background: var(--btn-green); }
+        .btn-delete { background: var(--btn-red); }
+        .btn-toggle { background: var(--deep-pink); }
+        .btn-reset { background: #6c757d; }
+
+        button:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        #canvas-container { flex: 1; width: 100%; position: relative; }
+        svg { width: 100%; height: 100%; }
+
+        .log-section {
+            flex: 1;
+            background: var(--soft-pink);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(142, 53, 99, 0.1);
+        }
+
+        .log-header h2 { font-size: 1.8rem; color: var(--deep-pink); font-weight: 800; }
+        .log-header p { font-size: 0.9rem; opacity: 0.7; margin-top: 5px; }
+
+        .sequence-box {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            overflow-y: auto;
+        }
+
+        .sequence-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-pink);
+            font-weight: 800;
+        }
+
+        #heapArrayDisplay {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--deep-pink);
+            line-height: 1.4;
+            word-break: break-all;
+            background: var(--soft-pink);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .complexity-grid {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .complexity-card {
+            flex: 1;
+            background: #fffafa;
+            border: 1px dashed var(--accent-pink);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .complexity-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--deep-pink);
+            margin-top: 4px;
+        }
+
+        /* Node Styling */
+        .node-circle { fill: white; stroke: var(--deep-pink); stroke-width: 2.5; transition: all 0.5s; }
+        .node-text { fill: var(--text-dark); font-weight: 800; font-size: 14px; pointer-events: none; }
+        .edge-line { stroke: var(--accent-pink); stroke-width: 2; opacity: 0.3; }
+        
+        /* Legend */
+        .legend { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--deep-pink); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-left">SynaptiQ</div>
+        <div class="nav-right" id="heapTypeLabel">MAX HEAP VISUALIZER</div>
+    </nav>
+
+    <main>
+        <section class="simulator-section">
+            <div class="controls">
+                <input type="number" id="nodeValue" placeholder="Val">
+                <button class="btn-insert" onclick="handleInsert()">Insert</button>
+                <button class="btn-delete" onclick="handleDelete()">Delete Root</button>
+                <button class="btn-toggle" onclick="toggleHeapType()">Toggle Max/Min</button>
+                <button class="btn-reset" onclick="resetHeap()">Reset</button>
+            </div>
+            
+            <div class="simulator-card">
+                <div id="canvas-container">
+                    <svg id="heapSvg">
+                        <g id="edgesGroup"></g>
+                        <g id="nodesGroup"></g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="log-section">
+            <div class="log-header">
+                <h2 id="logTitle">Max Heap State</h2>
+                <p>Visualization of Priority Queue logic</p>
+            </div>
+
+            <div class="sequence-box">
+                <div class="sequence-label">Array Representation</div>
+                <div id="heapArrayDisplay">[ ]</div>
+                
+                <div class="complexity-grid">
+                    <div class="complexity-card">
+                        <div class="sequence-label" style="letter-spacing: 1px;">Insert operation</div>
+                        <div class="complexity-val">O(log N)</div>
+                    </div>
+                    <div class="complexity-card">
+                        <div class="sequence-label" style="letter-spacing: 1px;">Delete operation</div>
+                        <div class="complexity-val">O(log N)</div>
+                    </div>
+                </div>
+
+                <div class="complexity-card" style="margin-top: 10px;">
+                    <div class="sequence-label">Space Complexity</div>
+                    <div class="complexity-val">O(N)</div>
+                </div>
+
+                <div style="flex:1"></div>
+
+                <div class="sequence-label">Heap Legend</div>
+                <div class="legend">
+                    <div class="legend-item"><div class="dot" style="background:var(--btn-green)"></div> Add Element</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--btn-red)"></div> Extract Root</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--deep-pink)"></div> Parent Node</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--accent-pink)"></div> Child Link</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let heap = [];
+        let isMaxHeap = true;
+        const svg = document.getElementById('heapSvg');
+        const nodesGroup = document.getElementById('nodesGroup');
+        const edgesGroup = document.getElementById('edgesGroup');
+        const arrayDisplay = document.getElementById('heapArrayDisplay');
+
+        const RADIUS = 22;
+        const V_SPACING = 70;
+
+        function toggleHeapType() {
+            isMaxHeap = !isMaxHeap;
+            document.getElementById('heapTypeLabel').textContent = isMaxHeap ? "MAX HEAP VISUALIZER" : "MIN HEAP VISUALIZER";
+            document.getElementById('logTitle').textContent = isMaxHeap ? "Max Heap State" : "Min Heap State";
+            // Re-build heap from scratch to satisfy new property
+            const oldValues = [...heap];
+            heap = [];
+            oldValues.forEach(v => insert(v));
+            render();
+        }
+
+        function handleInsert() {
+            const val = parseInt(document.getElementById('nodeValue').value);
+            if (isNaN(val)) return;
+            insert(val);
+            render();
+            document.getElementById('nodeValue').value = '';
+        }
+
+        function handleDelete() {
+            if (heap.length === 0) return;
+            extractRoot();
+            render();
+        }
+
+        function insert(val) {
+            heap.push(val);
+            bubbleUp(heap.length - 1);
+        }
+
+        function bubbleUp(index) {
+            while (index > 0) {
+                let parentIdx = Math.floor((index - 1) / 2);
+                if (isMaxHeap) {
+                    if (heap[index] <= heap[parentIdx]) break;
+                } else {
+                    if (heap[index] >= heap[parentIdx]) break;
+                }
+                [heap[index], heap[parentIdx]] = [heap[parentIdx], heap[index]];
+                index = parentIdx;
+            }
+        }
+
+        function extractRoot() {
+            if (heap.length === 1) return heap.pop();
+            const root = heap[0];
+            heap[0] = heap.pop();
+            bubbleDown(0);
+            return root;
+        }
+
+        function bubbleDown(index) {
+            while (true) {
+                let left = 2 * index + 1;
+                let right = 2 * index + 2;
+                let swapIdx = null;
+
+                if (left < heap.length) {
+                    if (isMaxHeap) {
+                        if (heap[left] > heap[index]) swapIdx = left;
+                    } else {
+                        if (heap[left] < heap[index]) swapIdx = left;
+                    }
+                }
+
+                if (right < heap.length) {
+                    if (isMaxHeap) {
+                        if ((swapIdx === null && heap[right] > heap[index]) || 
+                            (swapIdx !== null && heap[right] > heap[left])) swapIdx = right;
+                    } else {
+                        if ((swapIdx === null && heap[right] < heap[index]) || 
+                            (swapIdx !== null && heap[right] < heap[left])) swapIdx = right;
+                    }
+                }
+
+                if (swapIdx === null) break;
+                [heap[index], heap[swapIdx]] = [heap[swapIdx], heap[index]];
+                index = swapIdx;
+            }
+        }
+
+        function render() {
+            nodesGroup.innerHTML = '';
+            edgesGroup.innerHTML = '';
+            arrayDisplay.textContent = heap.length > 0 ? `[ ${heap.join(', ')} ]` : "[ ]";
+            
+            if (heap.length === 0) return;
+
+            const positions = [];
+            const containerWidth = svg.clientWidth;
+            
+            // Calculate coordinates for a complete binary tree
+            for (let i = 0; i < heap.length; i++) {
+                const level = Math.floor(Math.log2(i + 1));
+                const posInLevel = i - (Math.pow(2, level) - 1);
+                const numNodesInLevel = Math.pow(2, level);
+                
+                const x = (containerWidth / (numNodesInLevel + 1)) * (posInLevel + 1);
+                const y = 50 + (level * V_SPACING);
+                positions.push({ x, y });
+            }
+
+            // Draw Edges
+            for (let i = 0; i < heap.length; i++) {
+                let left = 2 * i + 1;
+                let right = 2 * i + 2;
+                if (left < heap.length) drawEdge(positions[i], positions[left]);
+                if (right < heap.length) drawEdge(positions[i], positions[right]);
+            }
+
+            // Draw Nodes
+            for (let i = 0; i < heap.length; i++) {
+                drawNode(positions[i].x, positions[i].y, heap[i]);
+            }
+        }
+
+        function drawNode(x, y, val) {
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", x); circle.setAttribute("cy", y);
+            circle.setAttribute("r", RADIUS);
+            circle.setAttribute("class", "node-circle");
+
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", x); text.setAttribute("y", y + 5);
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("class", "node-text");
+            text.textContent = val;
+
+            g.appendChild(circle);
+            g.appendChild(text);
+            nodesGroup.appendChild(g);
+        }
+
+        function drawEdge(p1, p2) {
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", p1.x); line.setAttribute("y1", p1.y);
+            line.setAttribute("x2", p2.x); line.setAttribute("y2", p2.y);
+            line.setAttribute("class", "edge-line");
+            edgesGroup.appendChild(line);
+        }
+
+        function resetHeap() {
+            heap = [];
+            render();
+        }
+
+        window.onload = () => {
+            [50, 30, 70, 20, 40, 60, 85].forEach(v => insert(v));
+            render();
+        };
+
+        window.onresize = render;
+    </script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynaptiQ | Graph BFS Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --porcelain: #FFFEFC;
+            --deep-pink: #8e3563;
+            --soft-pink: #fceef5;
+            --accent-pink: #d65a92;
+            --btn-green: #28a745;
+            --btn-red: #dc3545;
+            --text-dark: #2d1b24;
+            --card-shadow: 0 20px 40px rgba(142, 53, 99, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--porcelain);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        nav {
+            background: var(--deep-pink);
+            padding: 0 5%;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .nav-left { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .nav-right { font-weight: 400; font-size: 0.85rem; opacity: 0.9; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        /* Main Layout */
+        main {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            height: calc(100vh - 60px);
+        }
+
+        /* Left Side: Simulator */
+        .simulator-section {
+            flex: 0 0 60%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        .simulator-card {
+            flex: 1;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(142, 53, 99, 0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-image: radial-gradient(var(--soft-pink) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            justify-content: center;
+            border: 1px solid var(--soft-pink);
+            align-items: center;
+        }
+
+        .input-group { display: flex; gap: 8px; align-items: center; }
+        .input-label { font-size: 0.75rem; font-weight: 800; color: var(--deep-pink); text-transform: uppercase; }
+
+        input {
+            padding: 8px 12px;
+            border: 2px solid var(--soft-pink);
+            border-radius: 10px;
+            width: 70px;
+            outline: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.8rem;
+        }
+
+        .btn-insert { background: var(--btn-green); }
+        .btn-edge { background: var(--text-dark); }
+        .btn-bfs { background: var(--accent-pink); }
+        .btn-reset { background: #6c757d; }
+
+        button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #canvas-container { flex: 1; width: 100%; position: relative; }
+        svg { width: 100%; height: 100%; }
+
+        /* Right Side: Log */
+        .log-section {
+            flex: 1;
+            background: var(--soft-pink);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(142, 53, 99, 0.1);
+        }
+
+        .log-header h2 { font-size: 1.8rem; color: var(--deep-pink); font-weight: 800; }
+        .log-header p { font-size: 0.9rem; opacity: 0.7; margin-top: 5px; }
+
+        .sequence-box {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            overflow-y: auto;
+        }
+
+        .sequence-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-pink);
+            font-weight: 800;
+        }
+
+        #traversalSequence {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--deep-pink);
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .complexity-grid {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .complexity-card {
+            flex: 1;
+            background: #fffafa;
+            border: 1px dashed var(--accent-pink);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .complexity-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--deep-pink);
+            margin-top: 4px;
+        }
+
+        /* Node Styling */
+        .node-circle { fill: white; stroke: var(--deep-pink); stroke-width: 3; transition: all 0.4s; }
+        .node-text { fill: var(--text-dark); font-weight: 800; font-size: 13px; pointer-events: none; }
+        .edge-line { stroke: var(--deep-pink); stroke-width: 2.5; opacity: 0.2; transition: 0.4s; }
+        .visited-node { fill: var(--deep-pink) !important; filter: drop-shadow(0 0 8px rgba(142,53,99,0.3)); }
+        .visited-text { fill: white !important; }
+        .active-edge { stroke: var(--accent-pink); stroke-width: 4; opacity: 1; }
+
+        #traveller { fill: #FFD700; filter: drop-shadow(0 0 8px #FFD700); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .legend { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--deep-pink); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-left">SynaptiQ</div>
+        <div class="nav-right">Graph BFS Visualizer</div>
+    </nav>
+
+    <main>
+        <section class="simulator-section">
+            <div class="controls">
+                <div class="input-group">
+                    <input type="text" id="nodeName" placeholder="Node" maxlength="3">
+                    <button class="btn-insert" onclick="addNode()">Add Node</button>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="edgeFrom" placeholder="From">
+                    <input type="text" id="edgeTo" placeholder="To">
+                    <button class="btn-edge" onclick="addEdge()">Add Edge</button>
+                </div>
+                
+                <!-- NEW SOURCE NODE INPUT -->
+                <div class="input-group" style="background: var(--soft-pink); padding: 5px 12px; border-radius: 12px;">
+                    <span class="input-label">Source:</span>
+                    <input type="text" id="sourceNode" placeholder="A" style="width: 50px;">
+                </div>
+
+                <button class="btn-bfs" id="startBtn" onclick="runBFS()">Run BFS</button>
+                <button class="btn-reset" onclick="resetGraph()">Reset</button>
+            </div>
+            
+            <div class="simulator-card">
+                <div id="canvas-container">
+                    <svg id="graphSvg">
+                        <g id="edgesGroup"></g>
+                        <g id="nodesGroup"></g>
+                        <circle id="traveller" r="10" style="display:none;"></circle>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="log-section">
+            <div class="log-header">
+                <h2>Algorithm Output</h2>
+                <p>Real-time Graph BFS (Breadth-First Search)</p>
+            </div>
+
+            <div class="sequence-box">
+                <div class="sequence-label">BFS Traversal Sequence</div>
+                <div id="traversalSequence">—</div>
+                
+                <div class="complexity-grid">
+                    <div class="complexity-card">
+                        <div class="sequence-label">Time Complexity</div>
+                        <div class="complexity-val">O(V + E)</div>
+                    </div>
+                    <div class="complexity-card">
+                        <div class="sequence-label">Space Complexity</div>
+                        <div class="complexity-val">O(V)</div>
+                    </div>
+                </div>
+
+                <div style="flex:1"></div>
+
+                <div class="sequence-label">System Legend</div>
+                <div class="legend">
+                    <div class="legend-item"><div class="dot" style="background:var(--btn-green)"></div> New Node</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--text-dark)"></div> Connection</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--accent-pink)"></div> Visited</div>
+                    <div class="legend-item"><div class="dot" style="background:#FFD700"></div> BFS Head</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const nodes = new Map(); // Name -> {x, y, adj: []}
+        const svg = document.getElementById('graphSvg');
+        const nodesGroup = document.getElementById('nodesGroup');
+        const edgesGroup = document.getElementById('edgesGroup');
+        const traveller = document.getElementById('traveller');
+        const logDisplay = document.getElementById('traversalSequence');
+
+        function addNode() {
+            const name = document.getElementById('nodeName').value.trim().toUpperCase();
+            if (!name || nodes.has(name)) return;
+
+            // Positioning within margins
+            const pad = 60;
+            const x = pad + Math.random() * (svg.clientWidth - pad * 2);
+            const y = pad + Math.random() * (svg.clientHeight - pad * 2);
+
+            nodes.set(name, { x, y, adj: [] });
+            render();
+            document.getElementById('nodeName').value = '';
+        }
+
+        function addEdge() {
+            const u = document.getElementById('edgeFrom').value.trim().toUpperCase();
+            const v = document.getElementById('edgeTo').value.trim().toUpperCase();
+
+            if (nodes.has(u) && nodes.has(v) && u !== v) {
+                if (!nodes.get(u).adj.includes(v)) {
+                    nodes.get(u).adj.push(v);
+                    nodes.get(v).adj.push(u); // Undirected
+                }
+            }
+            render();
+            document.getElementById('edgeFrom').value = '';
+            document.getElementById('edgeTo').value = '';
+        }
+
+        function render() {
+            nodesGroup.innerHTML = '';
+            edgesGroup.innerHTML = '';
+
+            // Draw Edges
+            const drawn = new Set();
+            nodes.forEach((data, u) => {
+                data.adj.forEach(v => {
+                    const key = [u, v].sort().join('-');
+                    if (!drawn.has(key)) {
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", data.x);
+                        line.setAttribute("y1", data.y);
+                        line.setAttribute("x2", nodes.get(v).x);
+                        line.setAttribute("y2", nodes.get(v).y);
+                        line.setAttribute("class", "edge-line");
+                        line.setAttribute("id", `edge-${key}`);
+                        edgesGroup.appendChild(line);
+                        drawn.add(key);
+                    }
+                });
+            });
+
+            // Draw Nodes
+            nodes.forEach((data, name) => {
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", data.x); circle.setAttribute("cy", data.y);
+                circle.setAttribute("r", 20);
+                circle.setAttribute("class", "node-circle");
+                circle.setAttribute("id", `node-${name}`);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", data.x); text.setAttribute("y", data.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("class", "node-text");
+                text.setAttribute("id", `text-${name}`);
+                text.textContent = name;
+
+                g.appendChild(circle);
+                g.appendChild(text);
+                nodesGroup.appendChild(g);
+            });
+        }
+
+        async function runBFS() {
+            const source = document.getElementById('sourceNode').value.trim().toUpperCase();
+            
+            if (!source) {
+                alert("Please enter a Source Node.");
+                return;
+            }
+            if (!nodes.has(source)) {
+                alert(`Node ${source} does not exist in the graph.`);
+                return;
+            }
+
+            // Cleanup previous visual states
+            document.querySelectorAll('.node-circle').forEach(n => n.classList.remove('visited-node'));
+            document.querySelectorAll('.node-text').forEach(n => n.classList.remove('visited-text'));
+            document.querySelectorAll('.edge-line').forEach(e => e.classList.remove('active-edge'));
+
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            logDisplay.textContent = "";
+
+            const visited = new Set();
+            const queue = [source];
+            visited.add(source);
+
+            traveller.style.display = "block";
+
+            while (queue.length > 0) {
+                const u = queue.shift();
+                const uData = nodes.get(u);
+
+                // Move Head
+                traveller.setAttribute("cx", uData.x);
+                traveller.setAttribute("cy", uData.y);
+                
+                // Highlight Node
+                document.getElementById(`node-${u}`).classList.add('visited-node');
+                document.getElementById(`text-${u}`).classList.add('visited-text');
+                
+                logDisplay.textContent += (logDisplay.textContent ? " → " : "") + u;
+                
+                await new Promise(r => setTimeout(r, 800));
+
+                for (const v of uData.adj) {
+                    if (!visited.has(v)) {
+                        visited.add(v);
+                        queue.push(v);
+                        
+                        // Highlight edge
+                        const key = [u, v].sort().join('-');
+                        const edgeEl = document.getElementById(`edge-${key}`);
+                        if(edgeEl) edgeEl.classList.add('active-edge');
+                        
+                        await new Promise(r => setTimeout(r, 400));
+                    }
+                }
+            }
+
+            setTimeout(() => {
+                traveller.style.display = "none";
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        function resetGraph() {
+            nodes.clear();
+            render();
+            logDisplay.textContent = "—";
+            traveller.style.display = "none";
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('sourceNode').value = '';
+        }
+
+        // Initialize with default graph
+        window.onload = () => {
+            const initNodes = [
+                {n:'A', x:150, y:100}, {n:'B', x:350, y:80}, 
+                {n:'C', x:100, y:250}, {n:'D', x:400, y:280}, {n:'E', x:250, y:350}
+            ];
+            initNodes.forEach(obj => nodes.set(obj.n, {x: obj.x, y: obj.y, adj: []}));
+            
+            [['A','B'], ['A','C'], ['B','D'], ['C','E'], ['D','E'], ['B', 'E']].forEach(([u,v]) => {
+                nodes.get(u).adj.push(v);
+                nodes.get(v).adj.push(u);
+            });
+            render();
+            document.getElementById('sourceNode').value = 'A';
+        };
+    </script>
+</body>
+</html>

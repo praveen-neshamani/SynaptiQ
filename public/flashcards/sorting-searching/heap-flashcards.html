@@ -1,0 +1,880 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heaps & Memory Flashcards</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root {
+    --bg: #fdf2f5;
+    --bg2: #fce8ee;
+    --bg3: #f5d5de;
+    --surface: #ffffff;
+    --surface2: #fce8ee;
+    --border: rgba(123,45,80,0.08);
+    --border2: rgba(123,45,80,0.15);
+    --accent: #7b2d50;
+    --accent2: #a13d63;
+    --accent3: #8b3a5e;
+    --accent-light: #d4869e;
+    --accent-glow: rgba(123,45,80,0.08);
+    --accent-glow2: rgba(123,45,80,0.12);
+    --green: #43a047;
+    --green-dim: rgba(67,160,71,0.12);
+    --burgundy: #6d2348;
+    --burgundy-light: #8b3a5e;
+    --pink-soft: #f8dce5;
+    --pink-softer: #fdf0f4;
+    --pink-border: rgba(123,45,80,0.12);
+    --text: #2d1b30;
+    --text2: #8b6b7a;
+    --text3: #b8949f;
+    --card-q: #ffffff;
+    --card-a: #fdf5f7;
+    --radius: 18px;
+    --radius-sm: 10px;
+    --header-bg: linear-gradient(135deg, #7b2d50 0%, #a13d63 50%, #8b3a5e 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 4rem;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(123,45,80,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(123,45,80,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(123,45,80,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Top Header Bar */
+  .top-header {
+    width: 100%;
+    background: var(--header-bg);
+    padding: 18px 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 2px 12px rgba(123,45,80,0.2);
+    margin-bottom: 2rem;
+  }
+
+  .top-header .brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #fff;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .top-header .tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 640px;
+    position: relative;
+    z-index: 1;
+    padding: 0 1rem;
+  }
+
+  header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--burgundy);
+    line-height: 1.2;
+  }
+
+  header h1 em { font-style: italic; color: var(--accent2); }
+
+  header p {
+    font-size: 13.5px;
+    color: var(--text2);
+    font-weight: 300;
+    margin-top: 4px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1.75rem;
+  }
+
+  .stat {
+    background: #fff;
+    border: 1px solid var(--pink-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    flex: 1;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(123,45,80,0.06);
+  }
+
+  .stat-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--burgundy);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .stat-value.green { color: var(--green); }
+  .stat-value.accent { color: var(--accent2); }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .progress-wrap {
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--pink-soft);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 4px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    min-width: 52px;
+    text-align: right;
+  }
+
+  .scene {
+    width: 100%;
+    height: 260px;
+    perspective: 1100px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+
+  .card-wrap { width: 100%; height: 100%; }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  .face.front {
+    background: var(--card-q);
+    border: 1px solid var(--pink-border);
+    box-shadow: 0 2px 12px rgba(123,45,80,0.06);
+  }
+
+  .face.front::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    opacity: 0.7;
+  }
+
+  .face.back {
+    transform: rotateY(180deg);
+    background: var(--card-a);
+    border: 1px solid rgba(123,45,80,0.15);
+    box-shadow: 0 2px 12px rgba(123,45,80,0.06);
+  }
+
+  .face.back::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent2), var(--green), transparent);
+    opacity: 0.8;
+  }
+
+  .face-badge {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .face.back .face-badge { color: var(--accent); }
+
+  .face-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent-light);
+  }
+
+  .face.back .face-badge::before { background: var(--accent); }
+
+  .face-text {
+    font-size: 16.5px;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.65;
+    color: var(--text);
+    max-width: 100%;
+  }
+
+  .face.back .face-text { color: var(--burgundy); font-size: 16px; }
+
+  .card-num {
+    position: absolute;
+    bottom: 16px;
+    left: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .flip-hint {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text3);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity 0.3s;
+  }
+
+  .flip-hint svg { opacity: 0.5; }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--pink-border);
+    background: #fff;
+    color: var(--text2);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(123,45,80,0.06);
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--pink-softer);
+    color: var(--burgundy);
+    border-color: rgba(123,45,80,0.25);
+  }
+
+  .btn:active:not(:disabled) { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-flip {
+    padding: 13px 24px;
+    background: var(--accent-glow2);
+    border: 1px solid rgba(123,45,80,0.25);
+    color: var(--accent);
+    font-size: 13.5px;
+  }
+
+  .btn-flip:hover {
+    background: rgba(123,45,80,0.15) !important;
+    color: var(--burgundy) !important;
+    border-color: rgba(123,45,80,0.35) !important;
+  }
+
+  .jump-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+
+  .jump-row label { font-size: 13px; color: var(--text3); white-space: nowrap; }
+
+  .jump-row input {
+    width: 70px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--pink-border);
+    background: #fff;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+  }
+
+  .jump-row input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .jump-row button {
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--pink-border);
+    background: #fff;
+    color: var(--text2);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .jump-row button:hover { background: var(--pink-softer); color: var(--burgundy); }
+
+  .shuffle-btn {
+    margin-left: auto;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--pink-border);
+    background: #fff;
+    color: var(--text2);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .shuffle-btn:hover { background: var(--pink-softer); color: var(--burgundy); }
+
+  .done-screen {
+    display: none;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #fff;
+    border: 1px solid var(--pink-border);
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px rgba(123,45,80,0.06);
+  }
+
+  .done-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--green-dim);
+    border: 1px solid rgba(52,211,153,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 28px;
+  }
+
+  .done-screen h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--burgundy);
+    margin-bottom: 8px;
+  }
+
+  .done-screen p { font-size: 14px; color: var(--text2); margin-bottom: 1.75rem; line-height: 1.6; }
+
+  .done-screen .btn-row { display: flex; gap: 10px; justify-content: center; }
+
+  .btn-restart {
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(123,45,80,0.25);
+    background: var(--accent-glow2);
+    color: var(--accent);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-restart:hover { background: rgba(123,45,80,0.15); }
+
+  .kbd-hints {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+
+  .kbd-hint { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text3); }
+
+  kbd {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--pink-border);
+    background: #fff;
+    color: var(--text2);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wrapper > * { animation: fadeUp 0.4s ease both; }
+  header { animation-delay: 0s; }
+  .stats { animation-delay: 0.07s; }
+  .progress-wrap { animation-delay: 0.1s; }
+  .scene { animation-delay: 0.13s; }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .card-wrap.card-anim { animation: cardIn 0.3s ease both; }
+  .MathJax { font-size: 1em !important; }
+</style>
+</head>
+<body>
+
+<!-- Top burgundy header bar -->
+<div class="top-header">
+  <div class="brand">SynaptiQ</div>
+  <div class="tag">Flashcards</div>
+</div>
+
+<div class="wrapper">
+
+  <header>
+    <h1>Heaps &amp; <em>Memory</em></h1>
+    <p>35 flashcards · Click any card to reveal the answer</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value accent" id="statCurrent">1</div>
+      <div class="stat-label">Current</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value green" id="statDone">0</div>
+      <div class="stat-label">Reviewed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="statTotal">35</div>
+      <div class="stat-label">Total</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 / 35</div>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="card-wrap" id="cardWrap">
+      <div class="card" id="card">
+        <div class="face front">
+          <div class="face-badge">Question</div>
+          <div class="face-text" id="questionText"></div>
+          <div class="card-num" id="cardNum"></div>
+        </div>
+        <div class="face back">
+          <div class="face-badge">Answer</div>
+          <div class="face-text" id="answerText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flip-hint" id="flipHint">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M1 4v6h6M23 20v-6h-6"/>
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+    </svg>
+    Tap card to flip · Space to flip
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" onclick="prev()">← Previous</button>
+    <button class="btn btn-flip" onclick="flipCard()">Flip Card</button>
+    <button class="btn" id="nextBtn" onclick="next()" style="text-align:right">Next →</button>
+  </div>
+
+  <div class="jump-row">
+    <label>Jump to card:</label>
+    <input type="number" id="jumpInput" min="1" max="35" placeholder="1–35"/>
+    <button onclick="jumpToCard()">Go</button>
+    <button class="shuffle-btn" onclick="shuffleCards()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+        <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+      </svg>
+      Shuffle
+    </button>
+  </div>
+
+  <div class="done-screen" id="doneScreen">
+    <div class="done-icon">✓</div>
+    <h2>All cards reviewed!</h2>
+    <p>You've gone through all 35 flashcards.<br>Great work!</p>
+    <div class="btn-row">
+      <button class="btn-restart" onclick="restart()">↺ Start over</button>
+      <button class="btn-restart" style="background:var(--green-dim);border-color:rgba(52,211,153,0.3);color:var(--green);" onclick="shuffleAndRestart()">⟳ Shuffle &amp; restart</button>
+    </div>
+  </div>
+
+  <div class="kbd-hints">
+    <span class="kbd-hint"><kbd>←</kbd> Previous</span>
+    <span class="kbd-hint"><kbd>→</kbd> Next</span>
+    <span class="kbd-hint"><kbd>Space</kbd> Flip</span>
+    <span class="kbd-hint"><kbd>S</kbd> Shuffle</span>
+  </div>
+
+</div>
+
+<script>
+const RAW = [
+  [
+    "What is the defining characteristic of a 'max-heap' regarding the relationship between a parent node and its children?",
+    "The key of the parent node is always greater than or equal to the keys of its children."
+  ],
+  [
+    "What is the defining characteristic of a 'min-heap' regarding the relationship between a parent node and its children?",
+    "The key of the parent node is always less than or equal to the keys of its children."
+  ],
+  [
+    "A heap is a specialized version of which type of binary tree?",
+    "Complete binary tree"
+  ],
+  [
+    "In a complete binary tree, which direction is the last level filled?",
+    "From left to right"
+  ],
+  [
+    "How does the height of a complete binary tree with $n$ nodes relate to its size asymptotically?",
+    "The height is $\\Theta(\\log n)$."
+  ],
+  [
+    "Which abstract data type is a heap most commonly used to implement efficiently?",
+    "Priority Queue"
+  ],
+  [
+    "What is the worst-case time complexity for inserting a new element into a binary heap?",
+    "$O(\\log n)$"
+  ],
+  [
+    "What is the worst-case time complexity for the 'extract-max' or 'extract-min' operation in a binary heap?",
+    "$O(\\log n)$"
+  ],
+  [
+    "What is the time complexity to find the maximum element in a max-heap (or minimum in a min-heap)?",
+    "$\\Theta(1)$"
+  ],
+  [
+    "The process of restoring the heap property by moving a node up the tree is called _____.",
+    "Sift-up (or Up-heapify/Bubble-up)"
+  ],
+  [
+    "The process of restoring the heap property by moving a node down the tree is called _____.",
+    "Sift-down (or Down-heapify/Bubble-down/Sink)"
+  ],
+  [
+    "When deleting the root of a binary heap, which element is moved to the root position before performing a sift-down operation?",
+    "The last element in the heap's array representation."
+  ],
+  [
+    "What is the time complexity of the Floyd algorithm for building a heap from an unsorted array of $n$ elements?",
+    "$O(n)$"
+  ],
+  [
+    "Why is the linear build-heap algorithm ($O(n)$) more efficient than $n$ successive insertions?",
+    "Because the sum of the heights of all nodes in a complete binary tree is $O(n)$, and most nodes are near the leaves."
+  ],
+  [
+    "What is the total worst-case time complexity of the Heapsort algorithm for $n$ elements?",
+    "$O(n \\log n)$"
+  ],
+  [
+    "What is one primary advantage of Heapsort compared to Merge Sort regarding memory usage?",
+    "Heapsort is an in-place sorting algorithm."
+  ],
+  [
+    "Under what condition is the Heapsort algorithm preferred over Quick Sort?",
+    "When a guaranteed $O(n \\log n)$ worst-case time complexity is required without extra space."
+  ],
+  [
+    "How does a binary heap differ from a Binary Search Tree (BST) regarding the ordering of siblings?",
+    "In a heap, there is no implied ordering between siblings; in a BST, the left child must be smaller than the right child."
+  ],
+  [
+    "In terms of completeness, how does a binary heap differ from a standard Binary Search Tree?",
+    "A heap must be a complete binary tree, while a BST can be unbalanced or skewed."
+  ],
+  [
+    "Which variant of the heap data structure is known for having $O(1)$ amortized time for 'decrease-key' and 'meld' operations?",
+    "Fibonacci Heap"
+  ],
+  [
+    "What is a major practical disadvantage of Fibonacci heaps despite their superior theoretical amortized bounds?",
+    "They have high constant factors and are complicated to implement."
+  ],
+  [
+    "What is the purpose of the 'meld' operation in heap data structures?",
+    "To join two heaps into one while preserving the heap property."
+  ],
+  [
+    "In memory management, what is 'stack allocation' primarily used for?",
+    "Storing local variables and function call frames."
+  ],
+  [
+    "What is the primary characteristic of heap memory allocation compared to stack allocation regarding lifetime?",
+    "Heap memory remains allocated until explicitly freed or reclaimed by a garbage collector, whereas stack memory is freed when a function ends."
+  ],
+  [
+    "Which memory allocation method is generally faster: stack or heap?",
+    "Stack allocation"
+  ],
+  [
+    "What error occurs if a program exhausts the limited memory space of the call stack?",
+    "Stack Overflow"
+  ],
+  [
+    "What is 'garbage collection' in computer science?",
+    "A form of automatic memory management that reclaims memory no longer referenced by the program."
+  ],
+  [
+    "What is the core idea of 'tracing' garbage collection?",
+    "Determining reachable objects by following references from root objects and collecting the rest."
+  ],
+  [
+    "Which garbage collection strategy identifies garbage by keeping a count of references to each object?",
+    "Reference counting"
+  ],
+  [
+    "What is a significant drawback of basic reference counting regarding groups of objects?",
+    "It cannot reclaim memory from 'cycles' where objects refer to each other."
+  ],
+  [
+    "Which heap variant is specifically designed to support the 'union' of two heaps in $O(\\log n)$ worst-case time?",
+    "Binomial Heap"
+  ],
+  [
+    "In a max-heap, where is the smallest element guaranteed to be located?",
+    "At one of the leaf nodes."
+  ],
+  [
+    "Why is 'sift-down' used during linear build-heap instead of 'sift-up'?",
+    "Because 'sift-down' on all non-leaf nodes results in $O(n)$ complexity, while 'sift-up' on all nodes results in $O(n \\log n)$."
+  ],
+  [
+    "Which Java collection class provides a binary heap implementation?",
+    "java.util.PriorityQueue"
+  ],
+  [
+    "In Python, which module provides heap-based priority queue algorithms?",
+    "heapq"
+  ]
+];
+
+let cards = RAW.map((r, i) => ({ id: i, q: r[0], a: r[1] }));
+let current = 0, flipped = false, reviewed = 0;
+
+function renderCard(animate) {
+  if (current >= cards.length) { showDone(); return; }
+  const c = cards[current];
+  flipped = false;
+  const cardEl = document.getElementById('card');
+  cardEl.classList.remove('flipped');
+  if (animate) {
+    const wrapEl = document.getElementById('cardWrap');
+    wrapEl.classList.remove('card-anim');
+    void wrapEl.offsetWidth;
+    wrapEl.classList.add('card-anim');
+  }
+  document.getElementById('questionText').innerHTML = c.q;
+  document.getElementById('answerText').innerHTML = c.a;
+  document.getElementById('cardNum').textContent = `${current + 1} / ${cards.length}`;
+  document.getElementById('flipHint').style.opacity = '1';
+  document.getElementById('statCurrent').textContent = current + 1;
+  document.getElementById('statDone').textContent = reviewed;
+  const pct = (reviewed / cards.length * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${reviewed} / ${cards.length}`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').textContent = current === cards.length - 1 ? 'Finish ✓' : 'Next →';
+  if (window.MathJax) {
+    MathJax.typesetPromise([
+      document.getElementById('questionText'),
+      document.getElementById('answerText')
+    ]).catch(e => console.warn(e));
+  }
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('card').classList.toggle('flipped', flipped);
+  document.getElementById('flipHint').textContent = flipped
+    ? '↩ Tap again to flip back · Space to flip'
+    : '↩ Tap card to flip · Space to flip';
+}
+
+function next() {
+  if (current < cards.length) {
+    reviewed = Math.max(reviewed, current + 1);
+    current++;
+    renderCard(true);
+  }
+}
+
+function prev() { if (current > 0) { current--; renderCard(true); } }
+
+function jumpToCard() {
+  const val = parseInt(document.getElementById('jumpInput').value);
+  if (!isNaN(val) && val >= 1 && val <= cards.length) {
+    current = val - 1;
+    reviewed = Math.max(reviewed, current);
+    renderCard(true);
+    document.getElementById('jumpInput').value = '';
+  }
+}
+
+function shuffleCards() {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  current = 0; reviewed = 0;
+  document.getElementById('doneScreen').style.display = 'none';
+  document.getElementById('scene').style.display = '';
+  renderCard(true);
+}
+
+function shuffleAndRestart() { shuffleCards(); }
+
+function restart() {
+  cards = RAW.map((r, i) => ({ id: i, q: r[0], a: r[1] }));
+  current = 0; reviewed = 0;
+  document.getElementById('doneScreen').style.display = 'none';
+  document.getElementById('scene').style.display = '';
+  renderCard(true);
+}
+
+function showDone() {
+  document.getElementById('doneScreen').style.display = 'block';
+  document.getElementById('scene').style.display = 'none';
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressText').textContent = `${cards.length} / ${cards.length}`;
+  document.getElementById('statDone').textContent = cards.length;
+}
+
+document.getElementById('scene').addEventListener('click', flipCard);
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight') next();
+  else if (e.key === 'ArrowLeft') prev();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 's' || e.key === 'S') shuffleCards();
+});
+
+document.getElementById('jumpInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') jumpToCard();
+});
+
+renderCard(false);
+</script>
+</body>
+</html>

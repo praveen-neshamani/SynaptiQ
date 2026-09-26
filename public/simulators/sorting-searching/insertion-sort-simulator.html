@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynaptiQ | Insertion Sort Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --porcelain: #FFFEFC;
+            --deep-pink: #8e3563;
+            --soft-pink: #fceef5;
+            --accent-pink: #d65a92;
+            --btn-green: #28a745;
+            --btn-red: #dc3545;
+            --text-dark: #2d1b24;
+            --card-shadow: 0 20px 40px rgba(142, 53, 99, 0.1);
+            --bar-default: #d65a92;
+            --bar-compare: #FFD700;
+            --bar-sorted: #28a745;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--porcelain);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        nav {
+            background: var(--deep-pink);
+            padding: 0 5%;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .nav-left { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .nav-right { font-weight: 400; font-size: 0.85rem; opacity: 0.9; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        /* Main Layout */
+        main {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            height: calc(100vh - 60px);
+        }
+
+        /* Left Side: Simulator */
+        .simulator-section {
+            flex: 0 0 65%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .simulator-card {
+            flex: 1;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(142, 53, 99, 0.05);
+            padding: 40px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            background-image: radial-gradient(var(--soft-pink) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            justify-content: center;
+            border: 1px solid var(--soft-pink);
+        }
+
+        input {
+            padding: 10px 15px;
+            border: 2px solid var(--soft-pink);
+            border-radius: 10px;
+            width: 100px;
+            outline: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.85rem;
+        }
+
+        .btn-insert { background: var(--btn-green); }
+        .btn-sort { background: var(--deep-pink); }
+        .btn-reset { background: var(--accent-pink); }
+        .btn-random { background: #6c757d; }
+
+        button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Array Bar Styling */
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.4s ease;
+        }
+
+        .bar {
+            width: 45px;
+            background: var(--bar-default);
+            border-radius: 8px 8px 4px 4px;
+            transition: all 0.4s ease, height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 4px 10px rgba(142, 53, 99, 0.1);
+        }
+
+        .bar-label {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--deep-pink);
+        }
+
+        /* Sorting States */
+        .comparing { background: var(--bar-compare) !important; transform: scale(1.05); }
+        .sorted { background: var(--bar-sorted) !important; }
+        .moving-up { transform: translateY(-20px); opacity: 0.8; }
+
+        /* Right Side: Log */
+        .log-section {
+            flex: 1;
+            background: var(--soft-pink);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(142, 53, 99, 0.1);
+        }
+
+        .log-header h2 { font-size: 1.8rem; color: var(--deep-pink); font-weight: 800; }
+        .log-header p { font-size: 0.9rem; opacity: 0.7; margin-top: 5px; }
+
+        .sequence-box {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .status-msg {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--deep-pink);
+            padding: 12px;
+            border-left: 4px solid var(--accent-pink);
+            background: var(--porcelain);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .complexity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .complexity-card {
+            background: #fffafa;
+            border: 1px dashed var(--accent-pink);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .complexity-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: var(--accent-pink); }
+        .complexity-val { font-size: 1rem; font-weight: 800; color: var(--deep-pink); margin-top: 4px; }
+
+        /* Legend */
+        .legend { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.75rem; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--deep-pink); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-left">SynaptiQ</div>
+        <div class="nav-right">Insertion Sort Simulator</div>
+    </nav>
+
+    <main>
+        <section class="simulator-section">
+            <div class="controls">
+                <input type="number" id="inputValue" placeholder="Value" min="5" max="100">
+                <button class="btn-insert" onclick="addValue()">Add</button>
+                <button class="btn-random" onclick="generateRandom()">Random</button>
+                <button class="btn-sort" id="sortBtn" onclick="runInsertionSort()">Start Sort</button>
+                <button class="btn-reset" onclick="resetArray()">Reset</button>
+            </div>
+            
+            <div class="simulator-card" id="arrayContainer">
+                <!-- Bars generated by JS -->
+            </div>
+        </section>
+
+        <section class="log-section">
+            <div class="log-header">
+                <h2>Process Log</h2>
+                <p>Real-time algorithm execution steps</p>
+            </div>
+
+            <div class="sequence-box">
+                <div id="statusUpdate" class="status-msg">Waiting to start...</div>
+                
+                <div style="flex:1"></div>
+
+                <div class="complexity-grid">
+                    <div class="complexity-card">
+                        <div class="complexity-label">Worst Case</div>
+                        <div class="complexity-val">O(N²)</div>
+                    </div>
+                    <div class="complexity-card">
+                        <div class="complexity-label">Best Case</div>
+                        <div class="complexity-val">O(N)</div>
+                    </div>
+                    <div class="complexity-card">
+                        <div class="complexity-label">Average</div>
+                        <div class="complexity-val">O(N²)</div>
+                    </div>
+                    <div class="complexity-card">
+                        <div class="complexity-label">Space</div>
+                        <div class="complexity-val">O(1)</div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item"><div class="dot" style="background:var(--bar-default)"></div> Unsorted</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--bar-compare)"></div> Key/Compare</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--bar-sorted)"></div> Sorted Wall</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let array = [];
+        const container = document.getElementById('arrayContainer');
+        const statusUpdate = document.getElementById('statusUpdate');
+        const sortBtn = document.getElementById('sortBtn');
+
+        function render() {
+            container.innerHTML = '';
+            array.forEach((val, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bar-container';
+                wrapper.id = `box-${idx}`;
+
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${val * 3}px`;
+                bar.id = `bar-${idx}`;
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = val;
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(bar);
+                container.appendChild(wrapper);
+            });
+        }
+
+        function addValue() {
+            const input = document.getElementById('inputValue');
+            const val = parseInt(input.value);
+            if (isNaN(val) || val < 1 || val > 100) return;
+            if (array.length >= 12) {
+                alert("Simulator limit reached for visualization clarity.");
+                return;
+            }
+            array.push(val);
+            render();
+            input.value = '';
+        }
+
+        function generateRandom() {
+            resetArray();
+            for(let i=0; i<8; i++) {
+                array.push(Math.floor(Math.random() * 80) + 10);
+            }
+            render();
+        }
+
+        function resetArray() {
+            array = [];
+            render();
+            statusUpdate.textContent = "Waiting to start...";
+        }
+
+        async function runInsertionSort() {
+            if (array.length < 2) return;
+            const bars = document.querySelectorAll('.bar');
+            const containers = document.querySelectorAll('.bar-container');
+            sortBtn.disabled = true;
+
+            // Mark first element as sorted
+            bars[0].classList.add('sorted');
+
+            for (let i = 1; i < array.length; i++) {
+                let key = array[i];
+                let j = i - 1;
+
+                // Highlight current Key
+                statusUpdate.textContent = `Picking key: ${key}`;
+                bars[i].classList.add('comparing');
+                containers[i].classList.add('moving-up');
+                await new Promise(r => setTimeout(r, 600));
+
+                while (j >= 0 && array[j] > key) {
+                    statusUpdate.textContent = `Is ${array[j]} > ${key}? Yes. Shift ${array[j]} right.`;
+                    
+                    // Highlight the one we are comparing against
+                    bars[j].classList.add('comparing');
+                    await new Promise(r => setTimeout(r, 400));
+
+                    // Shift data and update UI
+                    array[j + 1] = array[j];
+                    
+                    // Visual sync
+                    const currentBar = document.getElementById(`bar-${j+1}`);
+                    const prevBar = document.getElementById(`bar-${j}`);
+                    currentBar.style.height = prevBar.style.height;
+                    document.querySelector(`#box-${j+1} .bar-label`).textContent = array[j];
+                    
+                    bars[j].classList.remove('comparing');
+                    bars[j+1].classList.add('sorted');
+                    
+                    j = j - 1;
+                }
+
+                // Place key
+                array[j + 1] = key;
+                const targetBar = document.getElementById(`bar-${j+1}`);
+                targetBar.style.height = `${key * 3}px`;
+                document.querySelector(`#box-${j+1} .bar-label`).textContent = key;
+                
+                statusUpdate.textContent = `Inserted ${key} at index ${j+1}`;
+                
+                // Cleanup animations
+                bars[i].classList.remove('comparing');
+                containers[i].classList.remove('moving-up');
+                
+                // Final sorted highlight
+                for(let k=0; k<=i; k++) bars[k].classList.add('sorted');
+                
+                await new Promise(r => setTimeout(r, 600));
+            }
+
+            statusUpdate.textContent = "Array fully sorted via Insertion Sort!";
+            sortBtn.disabled = false;
+        }
+
+        // Initial State
+        window.onload = () => {
+            array = [65, 20, 80, 10, 45];
+            render();
+        };
+    </script>
+</body>
+</html>
