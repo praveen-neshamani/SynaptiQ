@@ -4,24 +4,25 @@
 // ─────────────────────────────────────────────────────────────
 
 import { CourseVideo, VideoQuizMap } from './courseData'
+import { getSupabaseStorageUrl, getInteractiveToolUrl } from './storage'
 
 // 🎥 MAIN COURSE VIDEOS (2 videos)
 export const sortingSearchingMainVideos: CourseVideo[] = [
   {
     id: 'insertion_sort',
     title: 'Insertion Sort Algorithm',
-    url: '/videos/sorting-searching/insertion_sort.mp4',
+    url: getSupabaseStorageUrl('videos', 'sorting-searching/insertion_sort.mp4'),
     concept: 'insertion sort and incremental sorting',
-    simulatorUrl: '/simulators/sorting-searching/insertion-sort-simulator.html',
-    flashcardsUrl: '/flashcards/sorting-searching/insertion-sort-flashcards.html',
+    simulatorUrl: getInteractiveToolUrl('simulators', 'sorting-searching/insertion-sort-simulator.html'),
+    flashcardsUrl: getInteractiveToolUrl('flashcards', 'sorting-searching/insertion-sort-flashcards.html'),
   },
   {
     id: 'max_min_heap',
     title: 'Min Heap and Max Heap',
-    url: '/videos/sorting-searching/max_min_heap.mp4',
+    url: getSupabaseStorageUrl('videos', 'sorting-searching/max_min_heap.mp4'),
     concept: 'min heap, max heap, heap properties, and heapify operations',
-    simulatorUrl: '/simulators/sorting-searching/heap-simulator.html',
-    flashcardsUrl: '/flashcards/sorting-searching/heap-flashcards.html',
+    simulatorUrl: getInteractiveToolUrl('simulators', 'sorting-searching/heap-simulator.html'),
+    flashcardsUrl: getInteractiveToolUrl('flashcards', 'sorting-searching/heap-flashcards.html'),
   },
 ]
 
@@ -31,14 +32,14 @@ export const sortingSearchingFundamentals: Record<string, CourseVideo> = {
   array: {
     id: 'fund_array',
     title: '📌 Fundamentals: Array Data Structure',
-    url: '/videos/sorting-searching/fund_array.mp4',
+    url: getSupabaseStorageUrl('videos', 'sorting-searching/fund_array.mp4'),
     concept: 'arrays, indexing, memory layout, and array operations',
     isFundamental: true,
   },
   heap: {
     id: 'fund_heap',
     title: '📌 Fundamentals: Heap Data Structure',
-    url: '/videos/sorting-searching/fund_heap.mp4',
+    url: getSupabaseStorageUrl('videos', 'sorting-searching/fund_heap.mp4'),
     concept: 'heap structure, complete binary tree, heap property, and heapify',
     isFundamental: true,
   },

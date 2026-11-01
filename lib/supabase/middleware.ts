@@ -6,7 +6,7 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://tpofurpzsihnhtvmtrst.supabase.co'
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://byarghndcbqsrixgrrzn.supabase.co'
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_placeholder_anon_key'
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -67,6 +67,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon.ico') ||
     pathname.startsWith('/videos') ||
+    pathname.startsWith('/viewer') ||
     pathname.startsWith('/models')
 
   // If user is not logged in and requesting a protected page

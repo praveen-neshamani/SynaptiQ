@@ -4,32 +4,33 @@
 // ─────────────────────────────────────────────────────────────
 
 import { CourseVideo, VideoQuizMap } from './courseData'
+import { getSupabaseStorageUrl, getInteractiveToolUrl } from './storage'
 
 // 🎥 MAIN COURSE VIDEOS (3 videos)
 export const treeGraphMainVideos: CourseVideo[] = [
   {
     id: 'bfs',
     title: 'Breadth-First Search (BFS)',
-    url: '/videos/tree-graph-traversals/bfs.mp4',
+    url: getSupabaseStorageUrl('videos', 'tree-graph-traversals/bfs.mp4'),
     concept: 'breadth-first search and level-order traversal',
-    simulatorUrl: '/simulators/tree-graph-traversals/bfs-simulator.html',
-    flashcardsUrl: '/flashcards/tree-graph-traversals/bfs-flashcards.html',
+    simulatorUrl: getInteractiveToolUrl('simulators', 'tree-graph-traversals/bfs-simulator.html'),
+    flashcardsUrl: getInteractiveToolUrl('flashcards', 'tree-graph-traversals/bfs-flashcards.html'),
   },
   {
     id: 'dfs',
     title: 'Depth-First Search (DFS)',
-    url: '/videos/tree-graph-traversals/dfs.mp4',
+    url: getSupabaseStorageUrl('videos', 'tree-graph-traversals/dfs.mp4'),
     concept: 'depth-first search and recursive traversal',
-    simulatorUrl: '/simulators/tree-graph-traversals/dfs-simulator.html',
-    flashcardsUrl: '/flashcards/tree-graph-traversals/dfs-flashcards.html',
+    simulatorUrl: getInteractiveToolUrl('simulators', 'tree-graph-traversals/dfs-simulator.html'),
+    flashcardsUrl: getInteractiveToolUrl('flashcards', 'tree-graph-traversals/dfs-flashcards.html'),
   },
   {
     id: 'bst',
     title: 'Binary Search Tree (BST)',
-    url: '/videos/tree-graph-traversals/bst.mp4',
+    url: getSupabaseStorageUrl('videos', 'tree-graph-traversals/bst.mp4'),
     concept: 'binary search tree operations and properties',
-    simulatorUrl: '/simulators/tree-graph-traversals/bst-simulator.html',
-    flashcardsUrl: '/flashcards/tree-graph-traversals/bst-flashcards.html',
+    simulatorUrl: getInteractiveToolUrl('simulators', 'tree-graph-traversals/bst-simulator.html'),
+    flashcardsUrl: getInteractiveToolUrl('flashcards', 'tree-graph-traversals/bst-flashcards.html'),
   },
 ]
 
@@ -39,21 +40,21 @@ export const treeGraphFundamentals: Record<string, CourseVideo> = {
   queue: {
     id: 'fund_queue',
     title: '📌 Fundamentals: Queue Data Structure',
-    url: '/videos/tree-graph-traversals/fund_queue.mp4',
+    url: getSupabaseStorageUrl('videos', 'tree-graph-traversals/fund_queue.mp4'),
     concept: 'queue, FIFO principle, enqueue and dequeue operations',
     isFundamental: true,
   },
   stack: {
     id: 'fund_stack',
     title: '📌 Fundamentals: Stack Data Structure',
-    url: '/videos/tree-graph-traversals/fund_stack.mp4',
+    url: getSupabaseStorageUrl('videos', 'tree-graph-traversals/fund_stack.mp4'),
     concept: 'stack, LIFO principle, push and pop operations',
     isFundamental: true,
   },
   tree: {
     id: 'fund_tree',
     title: '📌 Fundamentals: Tree Data Structure',
-    url: '/videos/tree-graph-traversals/fund_tree.mp4',
+    url: getSupabaseStorageUrl('videos', 'tree-graph-traversals/fund_tree.mp4'),
     concept: 'tree structure, nodes, parent-child relationships, and tree terminology',
     isFundamental: true,
   },
