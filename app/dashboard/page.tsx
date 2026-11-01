@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { useMounted } from '@/hooks/useMounted'
 import { getAllCourses } from '@/lib/coursesRegistry'
 import CodeLabWorkspace from '@/components/CodeLabWorkspace'
 import ScholarSettingsWorkspace from '@/components/ScholarSettingsWorkspace'
 
 export default function StudentDashboard() {
+  const mounted = useMounted()
   const { user, displayName, loading, signOut } = useAuth()
   const router = useRouter()
   const courses = getAllCourses()
@@ -29,7 +30,7 @@ export default function StudentDashboard() {
     router.push(`/learn?course=${courseId}`)
   }
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F5F5F0]">
         <div className="flex items-center gap-3 text-[#8B3A62] font-semibold text-base">
@@ -301,25 +302,6 @@ export default function StudentDashboard() {
               <span>COHORT: <strong className="text-[#171717]">ALPHA-2025/CS</strong></span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
             </div>
-
-            {/* Faculty Dashboard Navigator */}
-            <Link
-              href="/faculty/analytics"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FFF5F8] border border-rose-200/80 text-xs font-semibold text-[#8B3A62] hover:bg-[#8B3A62] hover:text-white transition-all shadow-xs group"
-              title="Navigate to Faculty Dashboard & Analytics"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="7" height="9" rx="1" />
-                <rect x="14" y="3" width="7" height="5" rx="1" />
-                <rect x="14" y="12" width="7" height="9" rx="1" />
-                <rect x="3" y="16" width="7" height="5" rx="1" />
-              </svg>
-              <span className="hidden sm:inline">Faculty Dashboard</span>
-              <span className="sm:hidden">Faculty</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="transition-transform group-hover:translate-x-0.5">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </Link>
 
             {/* Notification Bell */}
             <button className="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors" aria-label="Notifications">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { updateUserPreferences } from '@/lib/db/profiles'
 
@@ -17,7 +17,12 @@ export default function ScholarSettingsWorkspace({
 }: ScholarSettingsWorkspaceProps) {
   const [activeSubTab, setActiveSubTab] = useState<'profile' | 'codelab' | 'telemetry' | 'security'>('profile')
   const [displayName, setDisplayName] = useState(studentName || 'Eleanor Vance')
-  const [email] = useState(studentEmail || 'eleanor.vance@synaptiq.edu')
+  const [email, setEmail] = useState(studentEmail || 'eleanor.vance@synaptiq.edu')
+
+  useEffect(() => {
+    if (studentName) setDisplayName(studentName)
+    if (studentEmail) setEmail(studentEmail)
+  }, [studentName, studentEmail])
   const [cohort] = useState('ALPHA-2025/CS')
   const [scholarId] = useState('SQ-94821')
 

@@ -1,30 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
+import { useMounted } from '@/hooks/useMounted'
 
 export default function StudentLoginPage() {
+  const mounted = useMounted()
   const router = useRouter()
   const { user, role, loading: authLoading, signInWithEmail, signUpWithEmail, signInWithOAuth } = useAuth()
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [fullName, setFullName] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  // If user is already authenticated, redirect
-  if (!authLoading && user) {
-    if (role === 'faculty') {
-      router.replace('/faculty/analytics')
-    } else {
-      router.replace('/dashboard')
+  // Auto-redirect if user is already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (role === 'faculty') {
+        router.replace('/faculty/analytics')
+      } else {
+        router.replace('/dashboard')
+      }
     }
-    return null
-  }
+  }, [authLoading, user, role, router])
 
   const handleOAuth = async (provider: 'google' | 'github') => {
     try {
@@ -74,11 +79,9 @@ export default function StudentLoginPage() {
           return
         }
 
-        // If session created immediately or user exists
         if (data?.session) {
           router.push('/dashboard')
         } else {
-          // If auto-confirmation or email login succeeded
           const loginRes = await signInWithEmail(email, password)
           if (!loginRes.error) {
             router.push('/dashboard')
@@ -98,7 +101,12 @@ export default function StudentLoginPage() {
   return (
     <main className="min-h-screen bg-[#F5F5F0] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#8B3A62]/10 selection:text-[#8B3A62]">
       {/* Brand Header */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="sm:mx-auto sm:w-full sm:max-w-md text-center"
+      >
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#8B3A62] text-white shadow-sm mb-4">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -115,21 +123,86 @@ export default function StudentLoginPage() {
             ? 'Sign in to access your adaptive learner cockpit'
             : 'Create your scholar account to begin mastery pathways'}
         </p>
-      </div>
+      </motion.div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-8 border border-slate-200/80 rounded-2xl shadow-xs">
+        <motion.div
+          layout
+          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+          className="bg-white py-8 px-6 sm:px-8 border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden"
+        >
+          {/* Mode Switcher Morph Tabs */}
+          <div className="flex rounded-lg bg-slate-100 p-1 mb-6 border border-slate-200/60">
+            <button
+              type="button"
+              onClick={() => {
+                setErrorMessage(null)
+                setMode('signin')
+              }}
+              className="relative flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors text-center cursor-pointer"
+            >
+              {mode === 'signin' && (
+                mounted ? (
+                  <motion.div
+                    layoutId="student-auth-tab"
+                    className="absolute inset-0 bg-white rounded-md shadow-xs border border-slate-200/70"
+                    transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-white rounded-md shadow-xs border border-slate-200/70" />
+                )
+              )}
+              <span className={`relative z-10 ${mode === 'signin' ? 'text-[#8B3A62]' : 'text-slate-600'}`}>
+                Sign In
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setErrorMessage(null)
+                setMode('signup')
+              }}
+              className="relative flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors text-center cursor-pointer"
+            >
+              {mode === 'signup' && (
+                mounted ? (
+                  <motion.div
+                    layoutId="student-auth-tab"
+                    className="absolute inset-0 bg-white rounded-md shadow-xs border border-slate-200/70"
+                    transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-white rounded-md shadow-xs border border-slate-200/70" />
+                )
+              )}
+              <span className={`relative z-10 ${mode === 'signup' ? 'text-[#8B3A62]' : 'text-slate-600'}`}>
+                Create Account
+              </span>
+            </button>
+          </div>
+
           {/* Error Banner */}
-          {errorMessage && (
-            <div className="mb-6 p-3.5 rounded-lg bg-rose-50 border border-rose-200 flex items-start gap-3">
-              <svg className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <p className="text-sm text-rose-800 leading-snug">{errorMessage}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {errorMessage && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 flex items-start gap-3">
+                  <svg className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <p className="text-sm text-rose-800 leading-snug">{errorMessage}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Social Auth Providers */}
           <div className="grid grid-cols-2 gap-3 mb-6">
@@ -137,7 +210,7 @@ export default function StudentLoginPage() {
               type="button"
               onClick={() => handleOAuth('google')}
               disabled={submitting}
-              className="w-full inline-flex justify-center items-center gap-2.5 py-2.5 px-4 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700 transition-colors shadow-xs disabled:opacity-50"
+              className="w-full inline-flex justify-center items-center gap-2.5 py-2.5 px-4 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -164,7 +237,7 @@ export default function StudentLoginPage() {
               type="button"
               onClick={() => handleOAuth('github')}
               disabled={submitting}
-              className="w-full inline-flex justify-center items-center gap-2.5 py-2.5 px-4 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700 transition-colors shadow-xs disabled:opacity-50"
+              className="w-full inline-flex justify-center items-center gap-2.5 py-2.5 px-4 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-4 h-4 text-[#171717]" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -183,27 +256,36 @@ export default function StudentLoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-white px-3 text-slate-500 font-medium tracking-wider">
-                Or continue with email
+                Or continue with institutional email
               </span>
             </div>
           </div>
 
-          {/* Email / Password Form */}
+          {/* Morphing Form Inputs */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'signup' && (
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Eleanor Vance"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B3A62]/20 focus:border-[#8B3A62] transition-colors"
-                />
-              </div>
-            )}
+            <AnimatePresence initial={false} mode="wait">
+              {mode === 'signup' && (
+                <motion.div
+                  key="signup-name-field"
+                  initial={{ opacity: 0, height: 0, y: -8 }}
+                  animate={{ opacity: 1, height: 'auto', y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -8 }}
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
+                  className="overflow-hidden"
+                >
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Eleanor Vance"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B3A62]/20 focus:border-[#8B3A62] transition-colors"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -214,7 +296,7 @@ export default function StudentLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@institution.edu"
+                placeholder="student@srec.ac.in"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B3A62]/20 focus:border-[#8B3A62] transition-colors"
               />
             </div>
@@ -230,20 +312,42 @@ export default function StudentLoginPage() {
                   </span>
                 )}
               </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B3A62]/20 focus:border-[#8B3A62] transition-colors font-mono"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full pl-3.5 pr-11 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B3A62]/20 focus:border-[#8B3A62] transition-colors font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.985 }}
               type="submit"
               disabled={submitting}
-              className="w-full mt-2 py-2.5 px-4 rounded-lg bg-[#8B3A62] hover:bg-[#722F50] text-white text-sm font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full mt-2 py-2.5 px-4 rounded-lg bg-[#8B3A62] hover:bg-[#722F50] text-white text-sm font-semibold transition-colors shadow-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
             >
               {submitting ? (
                 <>
@@ -258,10 +362,10 @@ export default function StudentLoginPage() {
               ) : (
                 'Create Student Account'
               )}
-            </button>
+            </motion.button>
           </form>
 
-          {/* Toggle Sign In / Sign Up */}
+          {/* Toggle Sign In / Sign Up Footer */}
           <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
             <span>
               {mode === 'signin' ? "Don't have an account?" : 'Already registered?'}
@@ -272,15 +376,20 @@ export default function StudentLoginPage() {
                 setErrorMessage(null)
                 setMode(mode === 'signin' ? 'signup' : 'signin')
               }}
-              className="font-semibold text-[#8B3A62] hover:text-[#722F50] transition-colors"
+              className="font-semibold text-[#8B3A62] hover:text-[#722F50] transition-colors cursor-pointer"
             >
               {mode === 'signin' ? 'Create an account' : 'Sign in instead'}
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Faculty Navigation Anchor */}
-        <div className="mt-6 text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="mt-6 text-center"
+        >
           <p className="text-xs text-slate-500">
             Faculty educator or researcher?{' '}
             <Link
@@ -293,7 +402,7 @@ export default function StudentLoginPage() {
               </svg>
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </main>
   )
