@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { updateUserPreferences } from '@/lib/db/profiles'
 
 interface ScholarSettingsWorkspaceProps {
   studentName: string
@@ -36,11 +38,17 @@ export default function ScholarSettingsWorkspace({
   const [milestoneAlerts, setMilestoneAlerts] = useState<boolean>(true)
   const [emailDigest, setEmailDigest] = useState<boolean>(false)
 
-  // Save state
+  const { user } = useAuth()
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (user?.id) {
+      await updateUserPreferences(user.id, {
+        codeLabFontSize: editorFontSize,
+        codeLabTabSize: tabSize,
+      })
+    }
     setSaveSuccess(true)
     setTimeout(() => {
       setSaveSuccess(false)

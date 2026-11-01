@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { saveLabSubmission } from '@/lib/db/labs'
 
 export interface CodeLabChallenge {
   id: string
@@ -394,6 +396,7 @@ export default function CodeLabWorkspace({
   initialChallengeId = 'avl-rotation',
   onBackToCockpit
 }: CodeLabWorkspaceProps) {
+  const { user } = useAuth()
   const [selectedChallengeId, setSelectedChallengeId] = useState<string>(initialChallengeId)
   const [code, setCode] = useState<string>('')
   const [activeEngine, setActiveEngine] = useState<'instant' | 'cloud'>('instant')
@@ -598,6 +601,24 @@ export default function CodeLabWorkspace({
       const allPassed = results.every((r) => r.passed)
 
       setTestResults(results)
+
+      // Persist lab submission to Supabase
+      if (user?.id) {
+        saveLabSubmission({
+          user_id: user.id,
+          challenge_id: activeChallenge.id,
+          code,
+          language: activeEngine === 'cloud' ? cloudLanguage : 'javascript',
+          passed: allPassed,
+          test_results: results.map((r) => ({
+            name: r.name,
+            passed: r.passed,
+            expected: r.expected,
+            actual: r.got,
+          })),
+          execution_time_ms: Math.round(totalDuration),
+        }).catch((err) => console.warn('Could not save lab submission:', err))
+      }
       setOutput({
         status: allPassed ? 'success' : 'error',
         logs: capturedLogs,

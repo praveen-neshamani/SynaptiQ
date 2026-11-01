@@ -8,6 +8,10 @@ import CodePlayground from '@/components/CodePlayground'
 import AxonBuddy from '@/components/AxonBuddy'
 import { getCourse } from '@/lib/coursesRegistry'
 import { CourseVideo, QuizQuestion } from '@/lib/courseData'
+import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
+import { updateModuleProgress } from '@/lib/db/progress'
+import { saveQuizAttempt } from '@/lib/db/quizzes'
 
 // ─────────────────────────────────────────────────────────────
 // app/learn/page.tsx
@@ -26,6 +30,7 @@ import { CourseVideo, QuizQuestion } from '@/lib/courseData'
 type Screen = 'video' | 'quiz_intro' | 'quiz' | 'kudos' | 'needs_basics'
 
 function LearnContent() {
+  const { user } = useAuth()
   const searchParams = useSearchParams()
   const courseId = searchParams.get('course') || 'tree-graph-traversals'
   const course = getCourse(courseId)
@@ -100,12 +105,12 @@ function LearnContent() {
 
   // ── Attention callbacks ───────────────────────────────────
   const handleDistraction = () => {
-    setWarning('⚠️ You are distracted! Please look at the screen.')
+    setWarning('Attention required: Please maintain active focus on the screen.')
     videoRef.current?.pause()
   }
 
   const handleSleep = () => {
-    setWarning('😴 You seem sleepy! Take a short break before continuing.')
+    setWarning('Cognitive fatigue detected: Take a brief pause before resuming.')
     videoRef.current?.pause()
   }
 
@@ -116,6 +121,18 @@ function LearnContent() {
 
   // ── Video ends → show quiz intro ────────────────────────────────
   const handleVideoEnd = () => {
+    if (user?.id) {
+      updateModuleProgress({
+        user_id: user.id,
+        course_id: courseId,
+        module_id: currentVideo.id,
+        status: 'in_progress',
+        video_watched: true,
+        quiz_passed: false,
+        score: null,
+        completed_at: null,
+      }).catch((err) => console.warn('Could not save video watch state:', err))
+    }
     setScreen('quiz_intro')
   }
 
@@ -179,6 +196,38 @@ function LearnContent() {
     // Check if ANY question was answered wrong
     const currentCorrect = selectedOption === quizQuestions[currentQIndex].correctIndex
     const anyMistake = correctCount < quizQuestions.length - 1 || !currentCorrect
+    const totalCorrect = correctCount + (currentCorrect ? 1 : 0)
+    const scorePct = Math.round((totalCorrect / Math.max(quizQuestions.length, 1)) * 100)
+
+    // Save quiz attempt & module progress to Supabase
+    if (user?.id) {
+      saveQuizAttempt({
+        user_id: user.id,
+        course_id: courseId,
+        module_id: currentVideo.id,
+        questions: quizQuestions.map((q, idx) => ({
+          question: q.question,
+          options: q.options,
+          correctIndex: q.correctIndex,
+          selectedIndex: idx === currentQIndex ? (selectedOption ?? 0) : 0,
+          isCorrect: idx === currentQIndex ? currentCorrect : true,
+        })),
+        score: scorePct,
+        total_questions: quizQuestions.length,
+        weak_concepts: anyMistake ? [currentVideo.concept] : [],
+      }).catch((err) => console.warn('Could not save quiz attempt:', err))
+
+      updateModuleProgress({
+        user_id: user.id,
+        course_id: courseId,
+        module_id: currentVideo.id,
+        status: !anyMistake ? 'completed' : 'in_progress',
+        video_watched: true,
+        quiz_passed: !anyMistake,
+        score: scorePct,
+        completed_at: !anyMistake ? new Date().toISOString() : null,
+      }).catch((err) => console.warn('Could not save module progress:', err))
+    }
 
     if (!anyMistake) {
       // Perfect score - increase difficulty and streak
@@ -253,9 +302,27 @@ function LearnContent() {
           alignItems: 'center',
           gap: 12,
         }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>
-            🧠 SynaptiQ
-          </span>
+          <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#fff' }}>
+            <div style={{
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              background: 'rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                <rect x="3" y="14" width="7" height="7" rx="1.5" />
+              </svg>
+            </div>
+            <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>
+              SynaptiQ
+            </span>
+          </Link>
           <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>Adaptive Learning</span>
           <span style={{
             marginLeft: 'auto',
@@ -269,8 +336,11 @@ function LearnContent() {
             alignItems: 'center',
             gap: 8,
           }}>
-            <span>
-              🔥 Streak: <b style={{ color: '#fff' }}>{streak}</b>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z" />
+              </svg>
+              <span>Streak: <b style={{ color: '#fff' }}>{streak}</b></span>
             </span>
             <span style={{ color: 'rgba(255,255,255,0.5)' }}>•</span>
             <span>
@@ -347,7 +417,7 @@ function LearnContent() {
                     fontWeight: 600,
                   }}
                 >
-                  I&apos;m back ✋
+                  I am ready
                 </button>
               </div>
             )}
@@ -405,7 +475,7 @@ function LearnContent() {
                   </video>
                 )}
                 <p style={{ margin: 0, fontSize: 12, color: '#2d2d2d' }}>
-                  📖 Watch the full video — {currentVideo.url.includes('youtube.com') || currentVideo.url.includes('drive.google.com') ? 'click button when done' : 'quiz appears when it ends'}.
+                  Watch the full video — {currentVideo.url.includes('youtube.com') || currentVideo.url.includes('drive.google.com') ? 'click button when done' : 'quiz appears when it ends'}.
                 </p>
 
                 {/* ── Interactive Learning Tools ──────────────────── */}
@@ -423,8 +493,15 @@ function LearnContent() {
                       fontWeight: 600,
                       color: '#8B3A62',
                       letterSpacing: '0.03em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
                     }}>
-                      🎯 Interactive Learning Tools
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
+                      </svg>
+                      <span>Interactive Learning Tools</span>
                     </h3>
                     <div style={{ display: 'flex', gap: 10 }}>
                       {currentVideo.simulatorUrl && (
@@ -459,7 +536,9 @@ function LearnContent() {
                             e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
-                          <span style={{ fontSize: 16 }}>🧪</span>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
+                          </svg>
                           <span>Try Simulator</span>
                         </a>
                       )}
@@ -495,7 +574,10 @@ function LearnContent() {
                             e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
-                          <span style={{ fontSize: 16 }}>🎴</span>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <path d="M7 7h10M7 12h10M7 17h6" />
+                          </svg>
                           <span>Study Flashcards</span>
                         </a>
                       )}
@@ -528,12 +610,26 @@ function LearnContent() {
                 alignItems: 'center',
                 gap: 16,
               }}>
-                <div style={{ fontSize: 64 }}>🎓</div>
+                <div style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 16,
+                  background: 'rgba(139,58,98,0.1)',
+                  color: '#8B3A62',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                  </svg>
+                </div>
                 <h2 style={{ color: '#8B3A62', fontSize: 24, margin: 0 }}>
-                  Let's test your knowledge!
+                  Knowledge Assessment
                 </h2>
                 <p style={{ color: '#2d2d2d', fontSize: 14, lineHeight: 1.6, maxWidth: 400 }}>
-                  You've completed <b>{currentVideo.title}</b>. Ready to see how much you've learned?
+                  You have completed <b>{currentVideo.title}</b>. Test your understanding before advancing to subsequent modules.
                 </p>
                 <button
                   onClick={handleStartQuiz}
@@ -552,7 +648,7 @@ function LearnContent() {
                   onMouseEnter={(e) => e.currentTarget.style.background = '#A0466E'}
                   onMouseLeave={(e) => e.currentTarget.style.background = '#8B3A62'}
                 >
-                  OK, I'm Ready! 🚀
+                  Start Assessment
                 </button>
               </div>
             )}
@@ -576,10 +672,16 @@ function LearnContent() {
                 </p>
 
                 {quizLoading ? (
-                  <p style={{ color: '#8B3A62' }}>⏳ Generating questions...</p>
+                  <p style={{ color: '#8B3A62', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                      <path d="M12 2a10 10 0 0 1 10 10" />
+                    </svg>
+                    <span>Generating questions...</span>
+                  </p>
                 ) : quizQuestions.length === 0 ? (
                   <div>
-                    <p style={{ color: '#8B3A62' }}>⚠️ Could not load questions.</p>
+                    <p style={{ color: '#8B3A62' }}>Could not load questions.</p>
                     <button
                       onClick={loadQuiz}
                       style={{
@@ -629,11 +731,23 @@ function LearnContent() {
                               fontWeight: answered && isCorrect ? 600 : 400,
                               fontSize: 14,
                               transition: 'all 0.15s',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
                             }}
                           >
-                            {String.fromCharCode(65 + idx)}. {opt}
-                            {answered && isCorrect  && ' ✅'}
-                            {answered && isSelected && !isCorrect && ' ❌'}
+                            <span>{String.fromCharCode(65 + idx)}. {opt}</span>
+                            {answered && isCorrect && (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            )}
+                            {answered && isSelected && !isCorrect && (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                              </svg>
+                            )}
                           </button>
                         )
                       })}
@@ -654,19 +768,25 @@ function LearnContent() {
                           gap: 8,
                           marginBottom: 8,
                         }}>
-                          <span style={{ fontSize: 18 }}>💡</span>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B3A62" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 18h6M10 22h4M15 2a6 6 0 0 0-6 6c0 2.2 1.2 4.2 3 5.3V15h6v-1.7c1.8-1.1 3-3.1 3-5.3a6 6 0 0 0-6-6z" />
+                          </svg>
                           <h4 style={{
                             margin: 0,
                             fontSize: 14,
                             fontWeight: 600,
                             color: '#8B3A62',
                           }}>
-                            Explanation
+                            Concept Explanation
                           </h4>
                         </div>
                         {loadingExplanation ? (
-                          <p style={{ color: '#8B3A62', fontSize: 13, margin: 0 }}>
-                            ⏳ Getting explanation...
+                          <p style={{ color: '#8B3A62', fontSize: 13, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                              <path d="M12 2a10 10 0 0 1 10 10" />
+                            </svg>
+                            <span>Retrieving pedagogical explanation...</span>
                           </p>
                         ) : (
                           <p style={{
@@ -717,16 +837,34 @@ function LearnContent() {
                 borderRadius: 12,
                 padding: 28,
                 textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}>
-                <div style={{ fontSize: 52 }}>🎉</div>
-                <h2 style={{ color: '#8B3A62', fontSize: 22, margin: '10px 0 6px' }}>
-                  Kudos! Keep it up!
+                <div style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
+                  background: 'rgba(139,58,98,0.1)',
+                  color: '#8B3A62',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 8,
+                }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="8" r="6" />
+                    <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                  </svg>
+                </div>
+                <h2 style={{ color: '#8B3A62', fontSize: 22, margin: '6px 0' }}>
+                  Concept Mastered
                 </h2>
                 <p style={{ color: '#2d2d2d', fontSize: 14, lineHeight: 1.6 }}>
-                  Strong grasp of <b>{currentVideo.title}</b>.<br />
+                  Demonstrated strong comprehension of <b>{currentVideo.title}</b>.<br />
                   {!isLastVideo
-                    ? "You're ready for the next advanced concept!"
-                    : '🏆 You completed the entire course!'}
+                    ? "You are ready for the subsequent architectural concept."
+                    : 'You have completed the entire course curriculum.'}
                 </p>
                 {!isLastVideo && (
                   <button
@@ -759,14 +897,31 @@ function LearnContent() {
                 borderRadius: 12,
                 padding: 28,
                 textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}>
-                <div style={{ fontSize: 52 }}>📌</div>
-                <h2 style={{ color: '#fbbf24', fontSize: 20, margin: '10px 0 6px' }}>
-                  Let&apos;s strengthen your foundation first
+                <div style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
+                  background: 'rgba(245,158,11,0.15)',
+                  color: '#f59e0b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 8,
+                }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </div>
+                <h2 style={{ color: '#fbbf24', fontSize: 20, margin: '6px 0' }}>
+                  Reinforcing Foundational Concept
                 </h2>
                 <p style={{ color: '#fde68a', fontSize: 14, lineHeight: 1.6 }}>
-                  You need stronger fundamentals in <b>{currentVideo.concept}</b>.<br />
-                  A basics video has been added to your graph:
+                  Diagnostic assessment identified an opportunity to reinforce <b>{currentVideo.concept}</b>.<br />
+                  A prerequisite module has been attached to your learning pathway:
                 </p>
                 <p style={{
                   margin: '8px 0 0',
@@ -781,10 +936,10 @@ function LearnContent() {
                   {insertedVideoTitle}
                 </p>
                 <p style={{ color: '#fbbf24', fontSize: 12, marginTop: 8 }}>
-                  Watch the basics video, then re-attempt this concept. 💪
+                  Complete the fundamental module, then re-attempt this assessment.
                 </p>
-                <p style={{ color: '#6b7280', fontSize: 12, marginBottom: 12 }}>
-                  Check the knowledge graph on the right — you&apos;ll see the new node!
+                <p style={{ color: '#9ca3af', fontSize: 12, marginBottom: 12 }}>
+                  Check the knowledge graph on the right to view the newly linked node.
                 </p>
                 <button
                   onClick={goToNextVideo}
@@ -839,7 +994,13 @@ function LearnContent() {
                   transition: 'all 0.2s',
                 }}
               >
-                <span>📊</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
                 <span>Knowledge Graph</span>
               </button>
               <button
@@ -861,7 +1022,10 @@ function LearnContent() {
                   transition: 'all 0.2s',
                 }}
               >
-                <span>💻</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
                 <span>Code Lab</span>
               </button>
             </div>

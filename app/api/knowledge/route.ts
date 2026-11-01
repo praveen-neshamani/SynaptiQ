@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const MODEL = 'openai/gpt-3.5-turbo'
@@ -28,18 +29,14 @@ async function callAI(prompt: string): Promise<string> {
   return data.choices?.[0]?.message?.content || ''
 }
 
-// ─────────────────────────────────────────────────────────────
-// POST /api/knowledge
-//
-// Request body can be one of two modes:
-//
-// MODE 1 — Generate quiz:
-// { mode: 'generate_quiz', concept: string, videoTitle: string, difficulty: 'easy'|'medium'|'hard', count: number }
-//
-// MODE 2 — Detect weak concept:
-// { mode: 'detect_weakness', concept: string, question: string, userAnswer: string, correctAnswer: string }
-// ─────────────────────────────────────────────────────────────
 export async function POST(req: Request) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user && process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Unauthorized. Please sign in to generate quizzes.' }, { status: 401 })
+  }
+
   const body = await req.json()
   const { mode } = body
 

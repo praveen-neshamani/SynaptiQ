@@ -1,15 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
 import { getAllCourses } from '@/lib/coursesRegistry'
 import CodeLabWorkspace from '@/components/CodeLabWorkspace'
 import ScholarSettingsWorkspace from '@/components/ScholarSettingsWorkspace'
 
 export default function StudentDashboard() {
-  const { data: session, status } = useSession()
+  const { user, displayName, loading, signOut } = useAuth()
   const router = useRouter()
   const courses = getAllCourses()
   const [activeTab, setActiveTab] = useState<'cockpit' | 'codelab' | 'settings' | 'curriculum' | 'analytics' | 'tuition'>('cockpit')
@@ -18,18 +18,18 @@ export default function StudentDashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const email = session?.user?.email || ''
-  const studentDisplayName = email ? email.split('@')[0] : 'Eleanor Vance'
+  const email = user?.email || ''
+  const studentDisplayName = displayName || (email ? email.split('@')[0] : 'Eleanor Vance')
 
   const logout = async () => {
-    await signOut({ callbackUrl: '/login' })
+    await signOut()
   }
 
   const startCourse = (courseId: string) => {
     router.push(`/learn?course=${courseId}`)
   }
 
-  if (status === 'loading') {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F5F5F0]">
         <div className="flex items-center gap-3 text-[#8B3A62] font-semibold text-base">

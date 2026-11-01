@@ -1,9 +1,8 @@
 import './globals.css'
-import AuthProvider from '@/components/AuthProvider'
 
 export const metadata = {
-  title: 'SynaptiQ',
-  description: 'AI Learning Platform',
+  title: 'SynaptiQ — Adaptive Neural Learning Cockpit',
+  description: 'AI-driven personalized computer science learning and analytics platform',
 }
 
 export default function RootLayout({
@@ -13,12 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+      <body className="antialiased">
+        {children}
       </body>
     </html>
   )
 }
-

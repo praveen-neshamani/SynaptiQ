@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server'
 import { chatWithAxonBuddy, generateQuizHelpPrompt, generateSingleExplanationPrompt } from '@/lib/openrouter'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: Request) {
-  console.log('\n=== EXPLAIN API CALLED ===')
   try {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Enforce authentication in production
+    if (!user && process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Unauthorized. Please sign in to access AI tutoring.' }, { status: 401 })
+    }
+
     const body = await req.json()
     console.log('Request body:', JSON.stringify(body, null, 2))
     

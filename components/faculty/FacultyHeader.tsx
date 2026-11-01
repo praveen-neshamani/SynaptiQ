@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
 
 interface FacultyHeaderProps {
   facultyName: string
@@ -18,8 +19,11 @@ export default function FacultyHeader({
   lastUpdated,
   onCourseChange,
 }: FacultyHeaderProps) {
+  const { user, displayName, signOut } = useAuth()
   const [selectedCourse, setSelectedCourse] = useState(courseName)
   const [liveTime, setLiveTime] = useState<string>('')
+
+  const activeFacultyName = displayName || (user?.email ? user.email.split('@')[0] : facultyName)
 
   // Synchronize selectedCourse with courseName prop
   useEffect(() => {
@@ -111,7 +115,7 @@ export default function FacultyHeader({
             {/* Faculty Profile */}
             <div className="bg-white/15 border border-white/25 rounded-lg px-3 py-1.5 text-right hidden sm:block">
               <div className="text-xs text-white/80 font-medium">Faculty</div>
-              <div className="text-xs font-semibold text-white">{facultyName}</div>
+              <div className="text-xs font-semibold text-white">{activeFacultyName}</div>
             </div>
 
             {/* Consolidated Live Status Indicator */}
@@ -127,6 +131,15 @@ export default function FacultyHeader({
                 </span>
               </div>
             </div>
+
+            {/* Sign Out Button */}
+            <button
+              onClick={() => signOut()}
+              title="Sign out of academic console"
+              className="bg-white/15 hover:bg-rose-500/80 border border-white/25 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors cursor-pointer"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>
