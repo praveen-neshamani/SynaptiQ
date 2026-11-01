@@ -1,4 +1,4 @@
-# SynaptiQ
+# SynaptiQ - Adaptive Learning Platform
 
 SynaptiQ is a web-based adaptive learning platform built for computer science students and instructors. It combines self-paced video instruction, concept quizzes, interactive simulations, and a faculty analytics interface called AURA (Adaptive Unified Resource and Assessment).
 
@@ -30,7 +30,7 @@ The platform is split into two primary areas:
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Authentication**: NextAuth.js
+- **Authentication**: Supabase Auth (@supabase/ssr)
 - **Database / Storage**: Supabase
 - **Computer Vision**: face-api.js (Tiny Face Detector models loaded from `public/models`)
 - **LLM Integration**: OpenRouter API (`@/lib/openrouter.ts`)
