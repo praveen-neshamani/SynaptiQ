@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
@@ -11,47 +11,22 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return request.cookies.get(name)?.value
+      getAll() {
+        return request.cookies.getAll()
       },
-      set(name: string, value: string, options: CookieOptions) {
-        request.cookies.set({
-          name,
-          value,
-          ...options,
-        })
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
         supabaseResponse = NextResponse.next({
-          request: {
-            headers: request.headers,
-          },
+          request,
         })
-        supabaseResponse.cookies.set({
-          name,
-          value,
-          ...options,
-        })
-      },
-      remove(name: string, options: CookieOptions) {
-        request.cookies.set({
-          name,
-          value: '',
-          ...options,
-        })
-        supabaseResponse = NextResponse.next({
-          request: {
-            headers: request.headers,
-          },
-        })
-        supabaseResponse.cookies.set({
-          name,
-          value: '',
-          ...options,
-        })
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        )
       },
     },
   })
 
-  // Do not run on static assets or Next internal files
+  // Refresh auth session
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -70,19 +45,26 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/viewer') ||
     pathname.startsWith('/models')
 
+  // Helper to construct a redirect response while PRESERVING all cookies set/refreshed by Supabase
+  const createRedirectResponse = (targetPath: string) => {
+    const url = request.nextUrl.clone()
+    url.pathname = targetPath
+    const redirectResponse = NextResponse.redirect(url)
+    
+    // Copy all cookies from supabaseResponse to the redirect response
+    // Without this, redirects wipe out refreshed authentication cookies!
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+    })
+    return redirectResponse
+  }
+
   // If user is not logged in and requesting a protected page
   if (!user && !isPublicPath) {
-    // If attempting to access faculty dashboard, redirect to faculty login
     if (pathname.startsWith('/faculty')) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/faculty/login'
-      return NextResponse.redirect(url)
+      return createRedirectResponse('/faculty/login')
     }
-
-    // Default protected routes redirect to student login
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return createRedirectResponse('/login')
   }
 
   // If user is logged in and visits login pages, redirect to respective dashboard
@@ -90,23 +72,16 @@ export async function updateSession(request: NextRequest) {
     const role = (user.user_metadata?.role as string) || 'student'
 
     if (pathname === '/login') {
-      const url = request.nextUrl.clone()
-      url.pathname = role === 'faculty' ? '/faculty/analytics' : '/dashboard'
-      return NextResponse.redirect(url)
+      return createRedirectResponse(role === 'faculty' ? '/faculty/analytics' : '/dashboard')
     }
 
     if (pathname === '/faculty/login') {
-      const url = request.nextUrl.clone()
-      url.pathname = '/faculty/analytics'
-      return NextResponse.redirect(url)
+      return createRedirectResponse('/faculty/analytics')
     }
 
     // Role protection: if a student tries to access /faculty/analytics, redirect to /dashboard
     if (pathname.startsWith('/faculty') && role !== 'faculty') {
-      // Allow access if faculty or admin
-      const url = request.nextUrl.clone()
-      url.pathname = '/dashboard'
-      return NextResponse.redirect(url)
+      return createRedirectResponse('/dashboard')
     }
   }
 
